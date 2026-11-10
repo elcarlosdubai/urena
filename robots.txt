@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://urenatax.com/sitemap.xml

@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>URENA TAX | Panel de Control & Operaciones</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    /* COLORES SÓLIDOS OFICIALES URENA TAX (SIN DEGRADADOS RAROS) */
+    /* PALETA URENA TAX: VERDE (#28D070), BLANCO (#FFFFFF), GRIS (#59595B) */
+    .bg-urena-white { background-color: #FFFFFF; }
+    .bg-urena-grey-bg { background-color: #F8F9FA; }
+    .bg-urena-grey-card { background-color: #F3F4F6; }
+    .bg-urena-grey { background-color: #59595B; }
+    .text-urena-grey { color: #59595B; }
+    .border-urena-grey { border-color: #E5E7EB; }
+    .bg-urena-green { background-color: #28D070; }
+    .text-urena-green { color: #28D070; }
+    .border-urena-green { border-color: #28D070; }
+    .bg-urena-green { background-color: #28D070; }
+    .text-urena-green { color: #28D070; }
+    .border-urena-green { border-color: #28D070; }
+    
+    /* BADGES POR SERVICIO */
+    .badge-Taxes { background-color: #28D0701A; color: #139C8E; border: 1px solid #28D0704D; }
+    .badge-ITIN { background-color: #59595B14; color: #1F2937; border: 1px solid #59595B33; }
+    .badge-Payroll { background-color: #28D07014; color: #1F2937; border: 1px solid #28D07033; }
+    .badge-Bookkeeping { background-color: #59595B1A; color: #59595B; border: 1px solid #59595B33; }
+
+    /* SIMULADOR WHATSAPP (BURBUJA DE CHAT) */
+    .wa-bubble {
+      background-color: #dcf8c6;
+      border-radius: 8px 8px 2px 8px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .wa-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      right: -6px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 0 10px 8px;
+      border-color: transparent transparent #dcf8c6 transparent;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+  </style>
+</head>
+<body class="bg-[#F4F5F6] text-[#1F2937] antialiased flex flex-col md:flex-row h-screen overflow-hidden text-sm">
+
+  <!-- ==================== SIDEBAR MÓVIL (HEADER) ==================== -->
+  <div class="md:hidden bg-white text-[#59595B] px-4 py-2.5 flex items-center justify-between border-b border-gray-200 z-30 flex-shrink-0">
+    <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax" class="h-8 w-auto" />
+    <button onclick="toggleMobileMenu()" class="p-1.5 text-[#59595B] hover:text-[#28D070] rounded-lg">
+      <i class="fa-solid fa-bars text-base"></i>
+    </button>
+  </div>
+
+  <div id="mobileOverlay" class="hidden md:hidden fixed inset-0 bg-black/40 z-40" onclick="toggleMobileMenu()"></div>
+
+  <!-- ==================== SIDEBAR DESKTOP (BLANCO, VERDE, GRIS URENA TAX) ==================== -->
+  <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-60 bg-white text-[#59595B] flex flex-col justify-between z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-gray-200 flex-shrink-0 shadow-xs">
+    <div>
+      <!-- Header con Logo Oficial de Urena Tax (Limpio, sin inversión) -->
+      <div class="h-20 flex items-center px-5 border-b border-gray-100">
+        <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax" class="h-10 w-auto" />
+      </div>
+
+      <!-- Menú de Módulos (Limpio: Lead, Calendario, Whatsapp, Email, Configuracion) -->
+      <nav class="p-3 space-y-1.5 mt-1">
+        <button onclick="switchTab('leads')" id="nav-leads" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all bg-[#28D070] text-black shadow-xs">
+          <i class="fa-solid fa-users text-sm"></i>
+          <span>Lead</span>
+          <span id="badgeCount" class="ml-auto text-xs px-2 py-0.5 rounded-full bg-black text-white font-bold">4</span>
+        </button>
+
+        <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
+          <i class="fa-regular fa-calendar-days text-sm"></i>
+          <span>Calendario</span>
+          <span class="ml-auto text-[11px] px-2 py-0.5 rounded bg-gray-100 text-[#28D070] font-bold">2 Citas</span>
+        </button>
+
+        <button onclick="switchTab('whatsapp')" id="nav-whatsapp" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
+          <i class="fa-brands fa-whatsapp text-sm"></i>
+          <span>Whatsapp</span>
+          <span class="ml-auto text-[10px] uppercase font-bold text-gray-400">Goteo</span>
+        </button>
+
+        <button onclick="switchTab('broadcast')" id="nav-broadcast" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
+          <i class="fa-solid fa-envelope text-sm"></i>
+          <span>Email</span>
+          <span class="ml-auto text-[10px] uppercase font-bold text-gray-400">Goteo</span>
+        </button>
+
+        <button onclick="switchTab('courses')" id="nav-courses" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
+          <i class="fa-solid fa-graduation-cap text-sm"></i>
+          <span>Cursos</span>
+          <span id="coursesBadge" class="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-[#28D070] font-bold border border-emerald-200">Online & Presencial</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
+          <i class="fa-solid fa-sliders text-sm"></i>
+          <span>Configuracion</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Botón directo a la web -->
+    <div class="p-3 border-t border-gray-100">
+      <a href="/" target="_blank" class="w-full py-2 px-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-[#59595B] hover:text-black flex items-center justify-between transition-colors">
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-[#28D070]"></i> Ver Web Pública
+        </span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==================== CONTENEDOR PRINCIPAL ==================== -->
+  <main class="flex-1 flex flex-col h-full overflow-hidden w-full">
+    
+    <!-- TOPBAR COMPACTO -->
+    <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between flex-shrink-0">
+      <div>
+        <h1 id="topbarTitle" class="text-base font-bold text-[#1F2937] leading-tight">Lead</h1>
+        <p class="text-[10px] text-gray-400">Urena Tax • Control Operativo de Clientes</p>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="simulateLead()" class="py-1.5 px-3 bg-[#28D070] hover:bg-emerald-500 text-black font-bold text-[11px] rounded-lg shadow-xs flex items-center gap-1.5 transition-all">
+          <i class="fa-solid fa-plus text-[10px]"></i>
+          <span>Simular Cliente Web</span>
+        </button>
+
+        <!-- WhatsApp Conectado en Vivo (Clickeable con Modal de Estado) -->
+        <button onclick="openWhatsAppStatusModal()" id="waHeaderBtn" class="bg-white hover:bg-gray-50 border border-gray-200 py-1.5 px-3.5 rounded-xl flex items-center gap-2.5 shadow-xs transition-all cursor-pointer text-left">
+          <div id="waStatusPulse" class="relative flex items-center justify-center">
+            <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-[#28D070] opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#28D070]"></span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <i id="waStatusIcon" class="fa-brands fa-whatsapp text-base text-[#28D070]"></i>
+            <div class="leading-none">
+              <span class="text-xs font-bold text-[#1F2937] block">(551) 232-1994</span>
+              <span id="waStatusLabel" class="text-[9px] font-bold text-[#28D070] uppercase tracking-wider">Conectado</span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </header>
+
+    <!-- ÁREA DE CONTENIDO SCROLLEABLE -->
+    <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 1: PROSPECTOS (LEADS)                                             -->
+      <!-- ========================================================================= -->
+      <section id="tab-leads" class="space-y-4">
+        
+        <!-- Métricas Rápidas -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold uppercase text-gray-400">Total Recibidos</p>
+              <h3 id="statTotal" class="text-xl font-black text-[#1F2937]">4</h3>
+            </div>
+            <div class="w-8 h-8 rounded-lg bg-gray-50 text-[#59595B] flex items-center justify-center text-xs">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold uppercase text-gray-400">Por Contactar</p>
+              <h3 id="statNuevos" class="text-xl font-black text-red-500">2</h3>
+            </div>
+            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center text-xs">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold uppercase text-gray-400">Citas Agendadas</p>
+              <h3 id="statCitas" class="text-xl font-black text-[#28D070]">1</h3>
+            </div>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#28D070] flex items-center justify-center text-xs">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold uppercase text-gray-400">Cerrados</p>
+              <h3 id="statCerrados" class="text-xl font-black text-[#28D070]">1</h3>
+            </div>
+            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#28D070] flex items-center justify-center text-xs">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros y Buscador -->
+        <div class="bg-white p-2.5 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row gap-2.5 items-center justify-between">
+          <div class="relative w-full sm:w-80">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+              <i class="fa-solid fa-magnifying-glass text-[10px]"></i>
+            </span>
+            <input type="text" id="leadSearch" oninput="filterLeads()" placeholder="Buscar cliente por nombre o teléfono..." class="w-full pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <select id="leadServiceFilter" onchange="filterLeads()" class="bg-gray-50 border border-gray-200 text-xs font-semibold py-1.5 px-2.5 rounded-lg focus:outline-none">
+              <option value="all">Todos los Servicios</option>
+              <option value="Taxes">Taxes Personales & Negocio</option>
+              <option value="ITIN">Número ITIN</option>
+              <option value="Payroll">Payroll</option>
+              <option value="Bookkeeping">Bookkeeping</option>
+            </select>
+
+            <button onclick="exportCSV()" class="py-1.5 px-3 bg-gray-100 hover:bg-slate-200 text-[#374151] font-bold text-xs rounded-lg flex items-center gap-1.5 transition-colors">
+              <i class="fa-solid fa-file-excel text-[#28D070]"></i> Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Vista Móvil (Cards) -->
+        <div id="leadsCardsMobile" class="md:hidden space-y-2.5"></div>
+
+        <!-- Vista Desktop (Tabla) -->
+        <div class="hidden md:block bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-[10px] font-bold uppercase text-gray-400 tracking-wider">
+                <th class="py-2.5 px-4">Cliente</th>
+                <th class="py-2.5 px-3">Teléfono</th>
+                <th class="py-2.5 px-3">Servicio</th>
+                <th class="py-2.5 px-3">Mensaje & Consulta</th>
+                <th class="py-2.5 px-3">Estado</th>
+                <th class="py-2.5 px-4 text-center">Contactar</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableDesktop" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 2: CALENDARIO COMPLETO (ESTILO FISCALCO)                          -->
+      <!-- ========================================================================= -->
+      <section id="tab-calendar" class="hidden space-y-4">
+        
+        <!-- BARRA SUPERIOR DEL CALENDARIO: Titulo y Boton Agendar -->
+        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-[#28D070]">
+              <i class="fa-regular fa-calendar-check text-base"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-extrabold text-[#1F2937]">Agenda Operativa de Citas</h3>
+              <p class="text-[10px] text-gray-400">Paterson, NJ • Oficina Ureña Tax (8 Clark St)</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            <!-- Boton Rapido: Agendar Cita Nueva -->
+            <button onclick="openNewAppointmentModal()" class="py-1.5 px-3 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-lg text-xs shadow-xs flex items-center gap-1.5 transition-all">
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>Agendar Cita</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LAYOUT DIVIDIDO (SPLIT VIEW): Calendario (7 Cols) + Panel Lateral de Citas (5 Cols) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+          
+          <!-- LADO IZQUIERDO: CALENDARIO COMPLETO (7 COLS) -->
+          <div class="lg:col-span-7 bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
+            <!-- Controles de Mes -->
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div class="flex items-center gap-2">
+                <h4 id="calMonthYear" class="text-sm font-bold text-[#1F2937]">Noviembre 2026</h4>
+                <div class="flex items-center gap-1 ml-2">
+                  <button onclick="prevMonth()" class="w-6 h-6 rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 text-[#59595B] flex items-center justify-center text-[10px]"><i class="fa-solid fa-chevron-left"></i></button>
+                  <button onclick="todayMonth()" class="px-2 py-0.5 rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 text-[#59595B] text-[10px] font-bold">Hoy</button>
+                  <button onclick="nextMonth()" class="w-6 h-6 rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-200 text-[#59595B] flex items-center justify-center text-[10px]"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+              </div>
+
+              <!-- Mini Leyenda -->
+              <div class="hidden sm:flex items-center gap-2 text-[10px] font-semibold text-[#59595B]">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#28D070]"></span> Taxes</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#139C8E]"></span> ITIN</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[#59595B]"></span> Otros</span>
+              </div>
+            </div>
+
+            <!-- Matriz de Dias -->
+            <div class="grid grid-cols-7 gap-px bg-gray-200 rounded-lg overflow-hidden border border-gray-200 text-xs">
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Dom</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Lun</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Mar</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Mie</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Jue</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Vie</div>
+              <div class="bg-gray-50 py-1.5 text-center font-bold text-[#59595B] text-[11px]">Sab</div>
+
+              <div id="calendarGridDays" class="contents">
+                <!-- Celdas renderizadas dinamicamente con JS -->
+              </div>
+            </div>
+            
+            <p class="text-[10px] text-gray-400 italic">Haz clic sobre cualquier dia del calendario para ver o agendar citas en esa fecha especifica.</p>
+          </div>
+
+          <!-- LADO DERECHO: PANEL DETALLADO DE CITAS (5 COLS) -->
+          <div class="lg:col-span-5 space-y-4">
+            
+            <!-- TARJETA: CITAS DEL DIA SELECCIONADO / HOY -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-gray-100">
+                <div>
+                  <span class="text-[10px] font-bold uppercase text-gray-400 tracking-wider block">Dia Seleccionado</span>
+                  <h4 id="selectedDateTitle" class="text-xs font-bold text-[#1F2937]">Hoy: Martes, 10 de Noviembre</h4>
+                </div>
+                <button onclick="openNewAppointmentModal(currentSelectedDate)" class="py-1 px-2.5 bg-gray-100 hover:bg-[#28D070] hover:text-black text-[#59595B] rounded-lg text-[10px] font-bold transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-plus"></i> Agendar Aqui
+                </button>
+              </div>
+
+              <!-- Lista de citas del dia -->
+              <div id="selectedDayAppointmentsList" class="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+                <!-- Render dinamico -->
+              </div>
+            </div>
+
+            <!-- TARJETA: RESUMEN DE LA SEMANA (PERSONAS DE ESTA SEMANA) -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-gray-100">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-calendar-week text-[#28D070]"></i>
+                  <h4 class="text-xs font-bold text-[#1F2937]">Personas Esta Semana (9 - 15 Nov)</h4>
+                </div>
+                <span id="weekCountBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#28D070] border border-emerald-200">4 Citas</span>
+              </div>
+
+              <!-- Lista rapida de la semana -->
+              <div id="weekAppointmentsList" class="space-y-2 max-h-[220px] overflow-y-auto pr-1 text-xs">
+                <!-- Render dinamico -->
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 3: WHATSAPP MASIVO CON SISTEMA DE GOTEO Y TELÉFONO SIMULADO       -->
+      <!-- ========================================================================= -->
+      <section id="tab-whatsapp" class="hidden space-y-4">
+        
+        <!-- Tarjetas del Motor de Goteo (Exacto a Fiscalco) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Enviados</p>
+            <p id="waSent" class="text-xl font-black text-emerald-600">18</p>
+            <p class="text-[9px] text-gray-400 font-bold mt-0.5">/ 25 en cola</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Modo de Envío</p>
+            <p class="text-sm font-black text-[#1F2937] mt-1">Sistema de Goteo</p>
+            <p class="text-[9px] text-emerald-600 font-bold">1 msg c/ 45 segs</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Protección Anti-Ban</p>
+            <p class="text-sm font-black text-emerald-600 mt-1">Activa (Segura)</p>
+            <p class="text-[9px] text-gray-400">Evita bloqueo del chip</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Estado del Motor</p>
+            <p class="text-sm font-black text-[#28D070] mt-1">En Proceso...</p>
+            <p class="text-[9px] text-gray-400">Próximo lote en 28s</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Editor del Mensaje Masivo (Izquierda) -->
+          <div class="lg:col-span-7 bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+              <h3 class="font-extrabold text-[#1F2937] text-sm flex items-center gap-1.5">
+                <i class="fa-brands fa-whatsapp text-emerald-500 text-base"></i> Redactar WhatsApp Masivo
+              </h3>
+              <span class="text-[10px] font-bold text-[#59595B] bg-gray-100 px-2 py-0.5 rounded">Audiencia: 25 Clientes</span>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-[#374151] uppercase mb-1">Plantilla de Mensaje</label>
+              <textarea id="waTextEditor" oninput="updatePhonePreview()" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none text-[#374151] leading-relaxed">Hola {nombre}! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En Urena Tax le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.</textarea>
+              <p class="text-[10px] text-gray-400 mt-1">Variables disponibles: <code class="text-[#28D070] font-bold">{nombre}</code>, <code class="text-[#28D070] font-bold">{servicio}</code></p>
+            </div>
+
+            <!-- Parámetros del Sistema de Goteo -->
+            <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+              <span class="text-[11px] font-bold text-[#1F2937] block">Configuración del Goteo (Drip):</span>
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="text-[10px] text-[#59595B] block">Intervalo entre mensajes:</label>
+                  <select class="w-full mt-1 p-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold">
+                    <option>40 - 60 segundos (Recomendado)</option>
+                    <option>30 - 45 segundos</option>
+                    <option>1 - 2 minutos (Ultra seguro)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-[#59595B] block">Tamaño por lote:</label>
+                  <select class="w-full mt-1 p-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold">
+                    <option>5 mensajes por tanda</option>
+                    <option>10 mensajes por tanda</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <button onclick="sendWaTest()" class="w-full py-2.5 bg-white hover:bg-gray-100 border border-gray-300 font-bold text-[#59595B] hover:text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-colors">
+                <i class="fa-brands fa-whatsapp text-[#28D070] text-sm"></i> Enviar Prueba
+              </button>
+              <button onclick="startWaDrip()" class="w-full py-2.5 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-colors">
+                <i class="fa-solid fa-play"></i> Iniciar Goteo
+              </button>
+            </div>
+          </div>
+
+          <!-- TELÉFONO SIMULADO EN VIVO (Derecha) -->
+          <div class="lg:col-span-5 flex flex-col items-center">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Vista Previa en Vivo (iPhone / WhatsApp)</span>
+            
+            <!-- Carcasa del Teléfono -->
+            <div class="w-[280px] bg-slate-900 rounded-[36px] p-2.5 shadow-xl border-4 border-slate-800">
+              <div class="w-full bg-[#E5DDD5] rounded-[28px] overflow-hidden flex flex-col h-[460px]">
+                
+                <!-- Barra de Estado del Teléfono -->
+                <div class="bg-[#075E54] text-white px-3 py-1.5 flex items-center justify-between text-[10px]">
+                  <span class="font-bold">9:41</span>
+                  <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-signal text-[8px]"></i>
+                    <i class="fa-solid fa-wifi text-[8px]"></i>
+                    <i class="fa-solid fa-battery-full text-[9px]"></i>
+                  </div>
+                </div>
+
+                <!-- Cabecera de WhatsApp -->
+                <div class="bg-[#075E54] text-white px-3 py-2 flex items-center gap-2 shadow-sm">
+                  <i class="fa-solid fa-arrow-left text-xs"></i>
+                  <div class="w-7 h-7 rounded-full bg-white p-0.5 flex items-center justify-center">
+                    <img src="/favicon.svg" alt="Urena Logo" class="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h5 class="font-bold text-xs leading-none">URENA TAX Oficial</h5>
+                    <span class="text-[9px] text-emerald-200">En línea</span>
+                  </div>
+                </div>
+
+                <!-- Contenedor del Chat -->
+                <div class="flex-1 p-3 overflow-y-auto space-y-2 flex flex-col justify-end">
+                  <div class="bg-white/80 text-center py-0.5 px-2 rounded-full text-[9px] text-[#59595B] mx-auto font-medium">
+                    Hoy
+                  </div>
+
+                  <!-- Burbuja Simulada -->
+                  <div class="wa-bubble p-2.5 max-w-[90%] self-end">
+                    <p id="phoneMessagePreview" class="text-[11px] text-[#1F2937] leading-tight">
+                      Hola Carlos Mendoza! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En Urena Tax le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.
+                    </p>
+                    <div class="flex items-center justify-end gap-1 mt-1 text-[8px] text-[#59595B]">
+                      <span>9:41 AM</span>
+                      <i class="fa-solid fa-check-double text-[#28D070]"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Input Falso de WhatsApp -->
+                <div class="bg-[#F0F0F0] p-1.5 flex items-center gap-2">
+                  <div class="flex-1 bg-white rounded-full py-1 px-3 text-[10px] text-gray-400">Escribe un mensaje</div>
+                  <div class="w-6 h-6 rounded-full bg-[#075E54] text-white flex items-center justify-center text-[10px]">
+                    <i class="fa-solid fa-microphone"></i>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 4: CAMPAÑAS EMAIL CON VISTA PREVIA (HTML / TEXTO Y GOTEO)        -->
+      <!-- ========================================================================= -->
+      <section id="tab-broadcast" class="hidden space-y-4">
+        
+        <!-- Tarjetas de Progreso Email (Goteo) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Emails Enviados</p>
+            <p class="text-xl font-black text-emerald-600">42</p>
+            <p class="text-[9px] text-gray-400 font-bold mt-0.5">/ 120 en cola</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Cadencia (Goteo)</p>
+            <p class="text-sm font-black text-[#1F2937] mt-1">20 correos / hora</p>
+            <p class="text-[9px] text-emerald-600 font-bold">100% Entregabilidad</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Servidor SMTP</p>
+            <p class="text-sm font-black text-emerald-600 mt-1">contact@urenatax...</p>
+            <p class="text-[9px] text-gray-400">Autenticado SPF / DKIM</p>
+          </div>
+          <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
+            <p class="text-[10px] uppercase font-bold text-gray-400">Tasa de Apertura</p>
+            <p class="text-sm font-black text-[#28D070] mt-1">48.6%</p>
+            <p class="text-[9px] text-gray-400">Temporada 2026</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Editor de Email (Izquierda) -->
+          <div class="lg:col-span-6 bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-3">
+            <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+              <h3 class="font-extrabold text-[#1F2937] text-sm">Creador de Campaña de Correo</h3>
+              
+              <!-- Selector HTML / Texto Plano -->
+              <div class="flex items-center bg-gray-100 p-0.5 rounded-lg text-[10px] font-bold">
+                <button onclick="setEmailFormat('html')" id="btnFormatHtml" class="py-1 px-2.5 rounded-md bg-white text-[#1F2937] shadow-xs">Plantilla HTML</button>
+                <button onclick="setEmailFormat('text')" id="btnFormatText" class="py-1 px-2.5 rounded-md text-[#59595B] hover:text-[#1F2937]">Texto Normal</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Asunto del Correo</label>
+              <input type="text" id="emailSubject" oninput="updateEmailPreview()" value="Su 10% de Descuento en Taxes 2026 con Urena Tax" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#28D070]">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Cuerpo del Correo</label>
+              <textarea id="emailBody" oninput="updateEmailPreview()" rows="7" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none text-[#374151] leading-relaxed font-mono">Estimado cliente,
+
+Le informamos que la temporada de declaración de impuestos 2026 ya está abierta.
+
+Como cliente de Urena Tax & Accounting Solutions, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
+
+Nuestros servicios incluyen:
+- Preparación y Reembolso Máximo de Taxes
+- Tramitación y Renovación de Número ITIN
+- Contabilidad de Negocio y Nómina (Payroll)
+
+Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson, NJ.</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              <button onclick="sendEmailTest()" class="w-full py-2.5 bg-white hover:bg-gray-100 border border-gray-300 font-bold text-[#59595B] hover:text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-colors">
+                <i class="fa-regular fa-paper-plane text-[#28D070] text-xs"></i> Enviar Prueba
+              </button>
+              <button onclick="startEmailDrip()" class="w-full py-2.5 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-colors">
+                <i class="fa-solid fa-play"></i> Iniciar Goteo
+              </button>
+            </div>
+          </div>
+
+          <!-- Vista Previa de Correo en Pantalla (Derecha) -->
+          <div class="lg:col-span-6 bg-white p-5 rounded-xl border border-gray-200 shadow-xs flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Vista Previa de Correo (Bandeja de Entrada)</span>
+            
+            <div class="flex-1 border border-gray-200 rounded-xl overflow-hidden bg-gray-50 flex flex-col">
+              <!-- Encabezado Cliente de Correo -->
+              <div class="bg-white p-3 border-b border-gray-200 space-y-1">
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-400">De:</span>
+                  <span class="font-bold text-[#1F2937]">Urena Tax &lt;contact@urenataxsolutions.com&gt;</span>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-400">Asunto:</span>
+                  <span id="previewEmailSubject" class="font-bold text-[#1F2937]">Su 10% de Descuento en Taxes 2026 con Urena Tax</span>
+                </div>
+              </div>
+
+              <!-- Contenedor Visual del Email -->
+              <div id="emailPreviewContainer" class="p-6 overflow-y-auto flex-1 bg-white">
+                <div class="max-w-md mx-auto space-y-4">
+                  <div class="text-center pb-3 border-b border-gray-100">
+                    <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Logo" class="h-8 mx-auto" />
+                  </div>
+                  <div id="emailPreviewContent" class="text-xs text-[#374151] leading-relaxed whitespace-pre-line">
+                    Estimado cliente,
+
+                    Le informamos que la temporada de declaración de impuestos 2026 ya está abierta.
+
+                    Como cliente de Urena Tax & Accounting Solutions, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
+
+                    Nuestros servicios incluyen:
+                    - Preparación y Reembolso Máximo de Taxes
+                    - Tramitación y Renovación de Número ITIN
+                    - Contabilidad de Negocio y Nómina (Payroll)
+
+                    Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson, NJ.
+                  </div>
+                  <div class="pt-3 text-center">
+                    <a href="https://wa.me/15512321994" target="_blank" class="inline-block py-2 px-4 bg-[#28D070] text-black font-bold rounded-lg text-xs shadow-xs">
+                      Agendar Cita por WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA: CURSOS ONLINE & PRESENCIAL (GESTIÓN, IMPORTACIÓN EXCEL & CAMPAÑAS)-->
+      <!-- ========================================================================= -->
+      <section id="tab-courses" class="hidden space-y-4">
+        
+        <!-- HEADER DE LA SECCIÓN CURSOS -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2.5 mb-1">
+              <span class="p-1.5 rounded-lg bg-emerald-50 text-[#28D070] text-sm">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </span>
+              <h2 class="text-base font-extrabold text-[#1F2937]">Academia Ureña Tax • Estudiantes & Prospectos de Cursos</h2>
+            </div>
+            <p class="text-xs text-[#59595B]">Gestión de alumnos inscritos e interesados en el Curso Completo de Taxes (Online en Stan Store y Presencial en Paterson, NJ).</p>
+          </div>
+
+          <!-- BOTONES DE ACCIÓN: Subir Excel + Enviar Oferta -->
+          <div class="flex items-center gap-2.5 w-full md:w-auto">
+            <input type="file" id="excelCourseInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleExcelUpload(event)">
+            
+            <button onclick="document.getElementById('excelCourseInput').click()" class="flex-1 md:flex-initial py-2 px-3.5 bg-white hover:bg-gray-50 border border-gray-300 text-[#1F2937] font-bold rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-file-excel text-[#28D070] text-sm"></i> Subir Base de Excel
+            </button>
+
+            <button onclick="openCourseBroadcastModal()" class="flex-1 md:flex-initial py-2 px-3.5 bg-[#28D070] hover:bg-emerald-500 text-black font-bold rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-paper-plane text-xs"></i> Enviar Oferta / Promo
+            </button>
+          </div>
+        </div>
+
+        <!-- TARJETAS DE CURSOS ACTIVOS & MÉTRICAS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Curso Online Stan Store -->
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#28D070] border border-emerald-200">Online • Stan Store</span>
+              <span class="text-xs font-black text-[#1F2937]">$297 USD</span>
+            </div>
+            <h3 class="text-sm font-bold text-[#1F2937]">Curso Completo de Taxes (Grabado)</h3>
+            <p class="text-xs text-[#59595B]">Formación paso a paso de impuestos individuales (1040, Schedule C, ITIN).</p>
+            <div class="pt-2 flex items-center justify-between border-t border-gray-100 text-xs">
+              <span class="text-[#59595B]">Interesados / Alumnos:</span>
+              <strong id="statOnlineStudents" class="text-black font-black">28</strong>
+            </div>
+          </div>
+
+          <!-- Curso Presencial Paterson -->
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-[#59595B] border border-gray-200">Presencial • Paterson, NJ</span>
+              <span class="text-xs font-black text-[#1F2937]">$497 USD</span>
+            </div>
+            <h3 class="text-sm font-bold text-[#1F2937]">Taller Intensivo Presencial</h3>
+            <p class="text-xs text-[#59595B]">Práctica en vivo con software tributario en 8 Clark St, Paterson, NJ.</p>
+            <div class="pt-2 flex items-center justify-between border-t border-gray-100 text-xs">
+              <span class="text-[#59595B]">Cupos Reservados:</span>
+              <strong id="statPresencialStudents" class="text-black font-black">14 / 20</strong>
+            </div>
+          </div>
+
+          <!-- Campaña / Tasa de Conversión -->
+          <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#139C8E] border border-emerald-200">Campaña Activa</span>
+              <span class="text-xs font-bold text-gray-400">Descuento 15%</span>
+            </div>
+            <h3 class="text-sm font-bold text-[#1F2937]">Cupón Especial Temporada</h3>
+            <p class="text-xs text-[#59595B]">Código: <code class="font-bold text-[#28D070] bg-gray-100 px-1.5 py-0.5 rounded">TAXES2026</code> para inscripciones antes del 30 Nov.</p>
+            <div class="pt-2 flex items-center justify-between border-t border-gray-100 text-xs">
+              <span class="text-[#59595B]">Tasa de Apertura Email:</span>
+              <strong class="text-[#28D070] font-black">62.4%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DE ESTUDIANTES / BASE DE DATOS DE EXCEL -->
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <h3 class="text-sm font-extrabold text-[#1F2937]">Base de Datos de Alumnos & Contactos para Cursos</h3>
+              <span id="coursesTotalBadge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-[#59595B]">4 Contactos</span>
+            </div>
+
+            <!-- Filtro de tipo de curso -->
+            <div class="flex items-center gap-2">
+              <select id="courseTypeFilter" onchange="renderCoursesTable()" class="p-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:outline-none">
+                <option value="all">Todos los Cursos</option>
+                <option value="Online">Curso Online</option>
+                <option value="Presencial">Taller Presencial</option>
+                <option value="Interesado">Interesados en Ofertas</option>
+              </select>
+              
+              <button onclick="downloadSampleExcel()" class="py-1.5 px-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-[#59595B] hover:text-black flex items-center gap-1.5">
+                <i class="fa-solid fa-download text-[10px]"></i> Plantilla Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- TABLA RESPONSIVA DE ALUMNOS -->
+          <div class="overflow-x-auto border border-gray-200 rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-gray-50 border-b border-gray-200 text-[#59595B] uppercase text-[10px] font-bold">
+                <tr>
+                  <th class="py-2.5 px-4">Estudiante / Prospecto</th>
+                  <th class="py-2.5 px-3">WhatsApp / Móvil</th>
+                  <th class="py-2.5 px-3">Modalidad</th>
+                  <th class="py-2.5 px-3">Estado Oferta</th>
+                  <th class="py-2.5 px-3">Origen / Fecha</th>
+                  <th class="py-2.5 px-4 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="coursesTableBody" class="divide-y divide-gray-100">
+                <!-- Se renderiza con JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 5: CONFIGURACIÓN DE HORARIOS Y DÍAS CERRADOS (SETTINGS)           -->
+      <!-- ========================================================================= -->
+      <section id="tab-settings" class="hidden space-y-4">
+        <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-6">
+          <div class="border-b border-gray-100 pb-3">
+            <h3 class="font-extrabold text-[#1F2937] text-sm flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-[#28D070]"></i> Configuración de Días y Horarios para Citas
+            </h3>
+            <p class="text-xs text-gray-400 mt-0.5">Define qué días abre la oficina y en qué horario los clientes pueden agendar.</p>
+          </div>
+
+          <!-- Días Laborables -->
+          <div class="space-y-3">
+            <label class="text-xs font-bold text-[#1F2937] uppercase block">Días de Atención en Oficina</label>
+            <div class="grid grid-cols-7 gap-2 text-center text-xs">
+              <label class="cursor-pointer">
+                <input type="checkbox" class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold text-gray-400">Dom</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Lun</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Mar</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Mié</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Jue</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Vie</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="checkbox" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Sáb</div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Rango de Horas -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-[#374151] block mb-1">Hora de Apertura:</label>
+              <input type="time" value="09:00" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-[#374151] block mb-1">Hora de Cierre:</label>
+              <input type="time" value="18:00" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold">
+            </div>
+          </div>
+
+          <!-- Duración por Cita -->
+          <div>
+            <label class="text-xs font-bold text-[#374151] block mb-1">Duración estimada por cliente:</label>
+            <select class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold">
+              <option>30 minutos por cita</option>
+              <option selected>45 minutos por cita (Recomendado para Taxes)</option>
+              <option>60 minutos por cita</option>
+            </select>
+          </div>
+
+          <!-- Bloqueo de Días Festivos / Feriados Cerrados -->
+          <div class="p-3 bg-red-50 border border-red-200 rounded-xl space-y-2">
+            <span class="text-xs font-bold text-red-700 block flex items-center gap-1.5">
+              <i class="fa-solid fa-ban"></i> Bloquear Fecha Específica (Día Cerrado)
+            </span>
+            <div class="flex gap-2">
+              <input type="date" value="2026-11-26" class="p-1.5 bg-white border border-red-200 rounded-lg text-xs flex-1">
+              <input type="text" value="Thanksgiving Day" class="p-1.5 bg-white border border-red-200 rounded-lg text-xs flex-1">
+              <button onclick="alert('Día bloqueado: Ningún cliente podrá reservar el 26 de Noviembre.')" class="py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs">Bloquear</button>
+            </div>
+          </div>
+
+
+          <!-- TARJETA: GENERADOR DE QR CODE PARA VOLANTES (FLYERS) -->
+          <div class="border-t border-gray-100 pt-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-extrabold text-[#1F2937] text-sm flex items-center gap-2">
+                  <i class="fa-solid fa-qrcode text-[#28D070]"></i> Generador de Código QR para Volantes Impresos
+                </h4>
+                <p class="text-xs text-gray-400 mt-0.5">Genera el código QR para imprimir en flyers. Cuando el cliente escanee, entrará a la landing directa de reserva con descuento.</p>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-[#28D070] border border-emerald-200">10% OFF Auto</span>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col sm:flex-row items-center gap-5">
+              <!-- Imagen del QR Generada en Vivo -->
+              <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-xs flex flex-col items-center flex-shrink-0">
+                <img id="qrPreviewImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://localhost:8080/cita/&color=1F2937" alt="QR Volante Urena Tax" class="w-32 h-32 object-contain" />
+                <span class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-wider">Escanear para probar</span>
+              </div>
+
+              <!-- Detalles del Enlace & Acciones -->
+              <div class="flex-1 space-y-2.5 text-xs text-left w-full">
+                <div>
+                  <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Enlace de Destino del Volante:</label>
+                  <div class="flex items-center gap-1.5">
+                    <input type="text" id="qrLandingUrl" readonly value="http://localhost:8080/cita/" class="w-full p-2 bg-white border border-gray-200 rounded-lg text-xs font-mono text-[#1F2937]" />
+                    <button onclick="navigator.clipboard.writeText(document.getElementById('qrLandingUrl').value); alert('Enlace copiado al portapapeles!');" class="p-2 px-3 bg-white hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-[#59595B]" title="Copiar enlace">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="p-2.5 bg-white rounded-lg border border-gray-200 space-y-1">
+                  <p class="text-[11px] text-[#1F2937] font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-[#28D070]"></i> Flujo Automático Activado:
+                  </p>
+                  <p class="text-[10px] text-[#59595B] leading-relaxed">
+                    1. El cliente escanea el volante y llena sus datos.<br>
+                    2. Se registra de inmediato en tu <strong>Lead</strong> y en tu <strong>Calendario</strong>.<br>
+                    3. Se abre WhatsApp automáticamente para confirmar la cita al asesor.
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                  <a href="/cita/" target="_blank" class="py-1.5 px-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-[#28D070]"></i> Abrir Landing
+                  </a>
+                  <a href="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=http://localhost:8080/cita/&color=1F2937" target="_blank" download="QR_Volante_UrenaTax.png" class="py-1.5 px-3 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-lg text-xs flex items-center gap-1.5 shadow-xs">
+                    <i class="fa-solid fa-download text-[10px]"></i> Descargar QR para Imprenta
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="alert('Horarios y reglas guardadas correctamente para la oficina.')" class="w-full py-2.5 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-xl text-xs shadow-xs">
+            Guardar Configuración de Citas
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== MODAL RAPIDO: AGENDAR CITA ==================== -->
+  
+  <!-- ==================== MODAL DE ESTADO WHATSAPP ==================== -->
+  
+  <!-- ==================== MODAL: ENVIAR OFERTA / PROMO DE CURSOS ==================== -->
+  <div id="modalCourseBroadcast" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl w-full max-w-lg p-5 border border-gray-200 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-[#1F2937]">Enviar Oferta o Comunicado a Base de Cursos</h3>
+            <p class="text-[10px] text-gray-400">Disparo por Goteo a Contactos de Excel & Registrados</p>
+          </div>
+        </div>
+        <button onclick="closeCourseBroadcastModal()" class="text-gray-400 hover:text-black w-6 h-6 flex items-center justify-center rounded-lg hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Canal de Envío *</label>
+            <select id="courseBroadcastChannel" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+              <option value="both">Correo Electrónico + WhatsApp</option>
+              <option value="email">Solo Correo Electrónico (Email)</option>
+              <option value="whatsapp">Solo WhatsApp (Goteo)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Audiencia Objetivo *</label>
+            <select id="courseBroadcastTarget" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+              <option value="all">Toda la Base de Excel y Contactos</option>
+              <option value="Online">Solo Interesados en Online (Stan Store)</option>
+              <option value="Presencial">Solo Interesados en Taller Presencial</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Asunto del Correo / Título de Oferta *</label>
+          <input type="text" id="courseBroadcastSubject" value="🎓 ¡Aprende a preparar Taxes y genera ingresos! 15% de Descuento con Ureña Tax" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Mensaje de la Oferta / Promoción *</label>
+          <textarea id="courseBroadcastMessage" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none text-[#374151] leading-relaxed">Hola {nombre}! 
+
+¿Quieres certificarte y aprender a preparar impuestos para esta temporada 2026?
+
+En Ureña Tax abrimos inscripciones con precio especial de temporada:
+✅ Curso Online Completo (A tu propio ritmo en Stan Store)
+✅ Taller Presencial Intensivo con software real en Paterson, NJ
+
+Usa el cupón TAXES2026 para un 15% de descuento directo.
+Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy mismo!</textarea>
+          <p class="text-[10px] text-gray-400 mt-1">Variables dinámicas: <code class="font-bold text-[#28D070]">{nombre}</code>, <code class="font-bold text-[#28D070]">{curso}</code></p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+        <button onclick="sendCourseTestOffer()" class="py-1.5 px-3 bg-white hover:bg-gray-100 border border-gray-300 text-[#59595B] hover:text-black font-bold rounded-lg text-xs flex items-center gap-1.5">
+          <i class="fa-regular fa-paper-plane text-[#28D070]"></i> Enviar Prueba a mi Correo
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button onclick="closeCourseBroadcastModal()" class="py-1.5 px-3 bg-gray-100 hover:bg-gray-200 text-[#59595B] font-bold rounded-lg text-xs">
+            Cancelar
+          </button>
+          <button onclick="startCourseBroadcast()" class="py-1.5 px-4 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-lg text-xs shadow-xs flex items-center gap-1.5">
+            <i class="fa-solid fa-play"></i> Iniciar Envío por Goteo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalWhatsAppStatus" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 border border-gray-200 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div id="waModalIconBg" class="w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-[#1F2937]">Servidor WhatsApp Baileys</h3>
+            <p id="waModalSubtitle" class="text-[10px] text-gray-400">Sesión activa • Línea Oficial</p>
+          </div>
+        </div>
+        <button onclick="closeWhatsAppStatusModal()" class="text-gray-400 hover:text-black w-6 h-6 flex items-center justify-center rounded-lg hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Estado Central -->
+      <div id="waModalStatusBox" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="relative flex h-3 w-3">
+            <span id="waModalPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75"></span>
+            <span id="waModalDot" class="relative inline-flex rounded-full h-3 w-3 bg-[#28D070]"></span>
+          </span>
+          <div>
+            <span class="text-xs font-bold text-[#1F2937] block">+1 (551) 232-1994</span>
+            <span id="waModalStateText" class="text-[10px] font-bold text-[#28D070]">Conectado y listo para envíos</span>
+          </div>
+        </div>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-gray-200 text-[#59595B]">En línea</span>
+      </div>
+
+      <!-- Acciones del Modal -->
+      <div class="space-y-2 pt-1">
+        <button onclick="sendWaTestFromModal()" class="w-full py-2.5 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all">
+          <i class="fa-brands fa-whatsapp text-sm"></i> Enviar Mensaje de Prueba
+        </button>
+
+        <button id="waToggleConnectBtn" onclick="toggleWhatsAppConnection()" class="w-full py-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-[#59595B] hover:text-red-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+          <i class="fa-solid fa-power-off text-xs"></i> Desconectar Línea
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalNewAppointment" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl w-full max-w-md p-5 border border-gray-200 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-[#28D070] flex items-center justify-center text-xs font-bold">
+            <i class="fa-solid fa-calendar-plus"></i>
+          </div>
+          <h3 class="text-xs font-bold text-[#1F2937]">Agendar Cita en Calendario</h3>
+        </div>
+        <button onclick="closeNewAppointmentModal()" class="text-gray-400 hover:text-black w-6 h-6 flex items-center justify-center rounded-lg hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Nombre del Cliente *</label>
+          <input type="text" id="aptName" placeholder="Ej: Juan Perez" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Telefono / WhatsApp *</label>
+            <input type="text" id="aptPhone" placeholder="(551) 000-0000" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Servicio *</label>
+            <select id="aptService" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+              <option value="Taxes">Taxes (Declaracion)</option>
+              <option value="ITIN">Tramite de ITIN</option>
+              <option value="Payroll">Nomina (Payroll)</option>
+              <option value="Bookkeeping">Contabilidad / Bookkeeping</option>
+              <option value="Notary">Notaria Publica</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Fecha de la Cita *</label>
+            <input type="date" id="aptDate" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Hora *</label>
+            <select id="aptTime" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+              <option value="09:30 AM">09:30 AM</option>
+              <option value="10:00 AM">10:00 AM</option>
+              <option value="11:00 AM">11:00 AM</option>
+              <option value="11:30 AM">11:30 AM</option>
+              <option value="01:00 PM">01:00 PM</option>
+              <option value="02:30 PM">02:30 PM</option>
+              <option value="03:00 PM">03:00 PM</option>
+              <option value="04:30 PM">04:30 PM</option>
+              <option value="05:30 PM">05:30 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-[#59595B] uppercase mb-1">Notas adicionales (opcional)</label>
+          <input type="text" id="aptNotes" placeholder="Ej: Viene con pasaporte original" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+        <button onclick="closeNewAppointmentModal()" class="py-1.5 px-3 bg-gray-100 hover:bg-gray-200 text-[#59595B] font-bold rounded-lg text-xs">
+          Cancelar
+        </button>
+        <button onclick="saveNewAppointment()" class="py-1.5 px-4 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-lg text-xs shadow-xs flex items-center gap-1.5">
+          <i class="fa-solid fa-check"></i> Guardar Cita
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DATOS DE PRUEBA REALES
+    const urenaLeads = [
+      { id: 1, name: "Carlos Mendoza", phone: "5512349876", email: "carlos.mendoza@gmail.com", service: "Taxes", message: "Quisiera cotización para taxes personales y qué documentos llevar.", date: "Hoy, 10:45 AM", status: "Nuevo" },
+      { id: 2, name: "María Fernández", phone: "9735558123", email: "mariaf23@yahoo.com", service: "ITIN", message: "Trámite de ITIN por primera vez sin mandar mi pasaporte físico.", date: "Hoy, 09:15 AM", status: "Nuevo" },
+      { id: 3, name: "Pedro Santana", phone: "2017774433", email: "pedro.santana@outlook.com", service: "ITIN", message: "Cita confirmada a las 11:30 AM en la oficina.", date: "Ayer, 4:20 PM", status: "Cita Agendada" },
+      { id: 4, name: "Bodega Prestige Corp", phone: "2018894411", email: "bodegaprestige@hotmail.com", service: "Payroll", message: "Servicio de nómina y sales tax para 4 empleados.", date: "08 Nov, 2:30 PM", status: "Cerrado" }
+    ];
+
+    function getLeads() {
+      const stored = localStorage.getItem("urena_crm_final_v4");
+      if (!stored) {
+        localStorage.setItem("urena_crm_final_v4", JSON.stringify(urenaLeads));
+        return urenaLeads;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveLeads(leads) {
+      localStorage.setItem("urena_crm_final_v4", JSON.stringify(leads));
+      renderLeads();
+    }
+
+    function toggleMobileMenu() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("mobileOverlay");
+      const isClosed = sidebar.classList.contains("-translate-x-full");
+      if (isClosed) {
+        sidebar.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+      }
+    }
+
+    function switchTab(tabId) {
+      ['leads', 'calendar', 'whatsapp', 'broadcast', 'courses', 'settings'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const nav = document.getElementById(`nav-${t}`);
+        nav.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all";
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      activeNav.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-bold transition-all bg-[#28D070] text-black shadow-xs";
+
+      const titles = {
+        'leads': 'Lead',
+        'calendar': 'Calendario',
+        'whatsapp': 'Whatsapp',
+        'broadcast': 'Email',
+        'courses': 'Cursos & Ofertas',
+        'settings': 'Configuracion'
+      };
+      document.getElementById('topbarTitle').textContent = titles[tabId];
+
+      if (window.innerWidth < 768) {
+        toggleMobileMenu();
+      }
+    }
+
+    function renderLeads() {
+      const leads = getLeads();
+      const mobileContainer = document.getElementById("leadsCardsMobile");
+      const desktopTbody = document.getElementById("leadsTableDesktop");
+      const searchVal = document.getElementById("leadSearch").value.toLowerCase();
+      const serviceVal = document.getElementById("leadServiceFilter").value;
+
+      document.getElementById("statTotal").textContent = leads.length;
+      document.getElementById("badgeCount").textContent = leads.filter(l => l.status === "Nuevo").length;
+      document.getElementById("statNuevos").textContent = leads.filter(l => l.status === "Nuevo").length;
+      document.getElementById("statCitas").textContent = leads.filter(l => l.status === "Cita Agendada").length;
+      document.getElementById("statCerrados").textContent = leads.filter(l => l.status === "Cerrado").length;
+
+      const filtered = leads.filter(l => {
+        const matchesSearch = l.name.toLowerCase().includes(searchVal) ||
+                              l.phone.includes(searchVal) ||
+                              l.message.toLowerCase().includes(searchVal);
+        const matchesService = serviceVal === "all" || l.service.toLowerCase().includes(serviceVal.toLowerCase());
+        return matchesSearch && matchesService;
+      });
+
+      mobileContainer.innerHTML = "";
+      desktopTbody.innerHTML = "";
+
+      filtered.forEach(lead => {
+        const cleanPhone = lead.phone.replace(/\D/g, "");
+        const waMsg = encodeURIComponent(`Hola ${lead.name}, le escribimos de Urena Tax en respuesta a su consulta sobre ${lead.service}. ¿En qué le podemos ayudar?`);
+        const waUrl = `https://wa.me/1${cleanPhone}?text=${waMsg}`;
+
+        // Card Móvil
+        const card = document.createElement("div");
+        card.className = "bg-white p-3.5 rounded-xl border border-gray-200 shadow-xs space-y-2.5";
+        card.innerHTML = `
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="font-bold text-[#1F2937] text-xs block">${lead.name}</span>
+              <a href="tel:+1${cleanPhone}" class="text-[11px] font-semibold text-[#28D070]">${lead.phone}</a>
+            </div>
+            <span class="inline-block py-0.5 px-2 rounded text-[10px] font-bold badge-${lead.service}">
+              ${lead.service}
+            </span>
+          </div>
+          <p class="text-[11px] text-[#59595B] bg-gray-50 p-2 rounded-lg">${lead.message}</p>
+          <div class="flex items-center justify-between pt-1">
+            <select onchange="changeStatus(${lead.id}, this.value)" class="py-1 px-1.5 rounded text-[10px] font-bold border border-gray-200 bg-white">
+              <option value="Nuevo" ${lead.status === "Nuevo" ? "selected" : ""}>🔴 Nuevo</option>
+              <option value="En Seguimiento" ${lead.status === "En Seguimiento" ? "selected" : ""}>🟡 Seguimiento</option>
+              <option value="Cita Agendada" ${lead.status === "Cita Agendada" ? "selected" : ""}>🔵 Cita</option>
+              <option value="Cerrado" ${lead.status === "Cerrado" ? "selected" : ""}>🟢 Cerrado</option>
+            </select>
+            <a href="${waUrl}" target="_blank" class="py-1 px-2.5 rounded-lg bg-[#28D070] text-black font-bold text-xs flex items-center gap-1 shadow-xs">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
+          </div>
+        `;
+        mobileContainer.appendChild(card);
+
+        // Tabla Desktop
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50 transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 px-4 font-semibold text-[#1F2937]">
+            <span class="block">${lead.name}</span>
+            <span class="text-[10px] text-gray-400 font-normal">${lead.email}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <a href="tel:+1${cleanPhone}" class="text-[#374151] hover:text-[#28D070] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-phone text-[9px] text-gray-400"></i> ${lead.phone}
+            </a>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="inline-block py-0.5 px-2 rounded text-[10px] font-bold badge-${lead.service}">
+              ${lead.service}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 max-w-[220px]">
+            <p class="text-[#59595B] truncate" title="${lead.message}">${lead.message}</p>
+            <span class="text-[9px] text-gray-400 block">${lead.date}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <select onchange="changeStatus(${lead.id}, this.value)" class="py-1 px-2 rounded text-[10px] font-bold border border-gray-200 bg-white">
+              <option value="Nuevo" ${lead.status === "Nuevo" ? "selected" : ""}>🔴 Nuevo</option>
+              <option value="En Seguimiento" ${lead.status === "En Seguimiento" ? "selected" : ""}>🟡 Seguimiento</option>
+              <option value="Cita Agendada" ${lead.status === "Cita Agendada" ? "selected" : ""}>🔵 Cita</option>
+              <option value="Cerrado" ${lead.status === "Cerrado" ? "selected" : ""}>🟢 Cerrado</option>
+            </select>
+          </td>
+          <td class="py-2.5 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <a href="${waUrl}" target="_blank" title="WhatsApp" class="w-6 h-6 rounded bg-[#28D070] hover:bg-emerald-500 text-black font-bold flex items-center justify-center shadow-xs">
+                <i class="fa-brands fa-whatsapp text-xs"></i>
+              </a>
+              <button onclick="removeLead(${lead.id})" title="Borrar" class="w-6 h-6 rounded bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center">
+                <i class="fa-solid fa-trash-can text-[10px]"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        desktopTbody.appendChild(tr);
+      });
+    }
+
+    function filterLeads() { renderLeads(); }
+
+    window.changeStatus = function(id, st) {
+      const leads = getLeads();
+      const item = leads.find(l => l.id === id);
+      if (item) { item.status = st; saveLeads(leads); }
+    };
+
+    window.removeLead = function(id) {
+      if (confirm("¿Deseas archivar este contacto?")) {
+        const leads = getLeads().filter(l => l.id !== id);
+        saveLeads(leads);
+      }
+    };
+
+    window.simulateLead = function() {
+      const ejemplos = [
+        { name: "Yomaira Gómez", service: "ITIN", msg: "Horario sábados para llevar pasaporte de mi esposo." },
+        { name: "Marcos Del Valle", service: "Taxes", msg: "Tengo W-2 y 1099, quiero cotización." },
+        { name: "Sabor Latino LLC", service: "Payroll", msg: "Asesoría fija y nómina para 6 meseros." }
+      ];
+      const item = ejemplos[Math.floor(Math.random() * ejemplos.length)];
+      const phone = "551" + Math.floor(1000000 + Math.random() * 9000000);
+
+      const newLead = {
+        id: Date.now(),
+        name: item.name,
+        phone: phone,
+        email: item.name.toLowerCase().replace(/\s+/g, '.') + "@gmail.com",
+        service: item.service,
+        message: item.msg,
+        date: "Hace un momento",
+        status: "Nuevo"
+      };
+
+      saveLeads([newLead, ...getLeads()]);
+    };
+
+    window.exportCSV = function() {
+      const leads = getLeads();
+      let csv = "ID,Nombre,Telefono,Email,Servicio,Mensaje,Fecha,Estado\n";
+      leads.forEach(l => {
+        csv += `"${l.id}","${l.name}","${l.phone}","${l.email}","${l.service}","${l.message}","${l.date}","${l.status}"\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `solicitudes_urena_tax.csv`;
+      a.click();
+    };
+
+    // ACTUALIZAR SIMULADOR DE TELÉFONO EN VIVO
+    window.updatePhonePreview = function() {
+      const text = document.getElementById("waTextEditor").value;
+      document.getElementById("phoneMessagePreview").textContent = text;
+    };
+
+    window.startWaDrip = function() {
+      alert("Iniciando Sistema de Goteo: Se enviarán 5 mensajes cada 45 segundos para proteger la línea contra bloqueos de WhatsApp.");
+    };
+
+    window.sendWaTest = function() {
+      const num = prompt("Ingresa tu número de WhatsApp para recibir la prueba (Ej: +15512321994 o 5512321994):", "+15512321994");
+      if (!num) return;
+      let text = document.getElementById("waTextEditor").value;
+      text = text.replace(/{nombre}/g, "Carlos (Prueba)").replace(/{servicio}/g, "Taxes 2026");
+      const clean = num.replace(/\D/g, "");
+      const url = "https://wa.me/" + clean + "?text=" + encodeURIComponent(text);
+      window.open(url, '_blank');
+    };
+
+    window.sendEmailTest = function() {
+      const email = prompt("Ingresa el correo al que deseas enviar la prueba:", "admin@urenatax.com");
+      if (!email) return;
+      const subj = document.getElementById("emailSubject").value;
+      alert("✅ Correo de prueba enviado con éxito a: " + email + "\n\nAsunto: " + subj + "\n\nFormato HTML/Texto verificado.");
+    };
+
+    window.startEmailDrip = function() {
+      alert("Iniciando Campaña por Goteo: 20 correos por hora mediante cola SMTP para garantizar 100% de entregabilidad en bandeja principal.");
+    };
+
+    // ACTUALIZAR VISTA PREVIA EMAIL
+    window.updateEmailPreview = function() {
+      const subj = document.getElementById("emailSubject").value;
+      const body = document.getElementById("emailBody").value;
+      document.getElementById("previewEmailSubject").textContent = subj;
+      document.getElementById("emailPreviewContent").textContent = body;
+    };
+
+    window.setEmailFormat = function(fmt) {
+      const btnH = document.getElementById("btnFormatHtml");
+      const btnT = document.getElementById("btnFormatText");
+      if (fmt === 'html') {
+        btnH.className = "py-1 px-2.5 rounded-md bg-white text-[#1F2937] shadow-xs";
+        btnT.className = "py-1 px-2.5 rounded-md text-[#59595B] hover:text-[#1F2937]";
+      } else {
+        btnT.className = "py-1 px-2.5 rounded-md bg-white text-[#1F2937] shadow-xs";
+        btnH.className = "py-1 px-2.5 rounded-md text-[#59595B] hover:text-[#1F2937]";
+      }
+    };
+
+    
+    // =========================================================================
+    // MOTOR DE CALENDARIO Y GESTION DE CITAS (SPLIT VIEW)
+    // =========================================================================
+    let currentCalYear = 2026;
+    let currentCalMonth = 10; // Noviembre (0-indexed: 10 = Noviembre)
+    let currentSelectedDate = "2026-11-10"; // Por defecto Hoy
+
+    const initialAppointments = [
+      { id: 1, name: "Pedro Santana", phone: "(551) 234-8899", service: "ITIN", date: "2026-11-10", time: "11:30 AM", notes: "Tramite por primera vez con pasaporte" },
+      { id: 2, name: "Bodega Prestige LLC", phone: "(973) 442-1100", service: "Payroll", date: "2026-11-10", time: "03:00 PM", notes: "Cierre de nomina quincenal" },
+      { id: 3, name: "Carlos Mendoza", phone: "(201) 889-4411", service: "Taxes", date: "2026-11-11", time: "10:00 AM", notes: "W2 y 1099 de Uber" },
+      { id: 4, name: "Restaurante Sabor Latino", phone: "(973) 551-7722", service: "Payroll", date: "2026-11-14", time: "12:00 PM", notes: "Revision contable trimestral" },
+      { id: 5, name: "Ana Maria Gomez", phone: "(551) 998-3321", service: "Taxes", date: "2026-11-16", time: "02:30 PM", notes: "Credito tributario por hijos" }
+    ];
+
+    function getAppointments() {
+      const stored = localStorage.getItem("urena_appointments_v1");
+      if (!stored) {
+        localStorage.setItem("urena_appointments_v1", JSON.stringify(initialAppointments));
+        return initialAppointments;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch(e) {
+        return initialAppointments;
+      }
+    }
+
+    function saveAppointmentsList(list) {
+      localStorage.setItem("urena_appointments_v1", JSON.stringify(list));
+      renderCalendar();
+    }
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    window.prevMonth = function() {
+      currentCalMonth--;
+      if (currentCalMonth < 0) {
+        currentCalMonth = 11;
+        currentCalYear--;
+      }
+      renderCalendar();
+    };
+
+    window.nextMonth = function() {
+      currentCalMonth++;
+      if (currentCalMonth > 11) {
+        currentCalMonth = 0;
+        currentCalYear++;
+      }
+      renderCalendar();
+    };
+
+    window.todayMonth = function() {
+      currentCalYear = 2026;
+      currentCalMonth = 10;
+      currentSelectedDate = "2026-11-10";
+      renderCalendar();
+    };
+
+    window.selectCalendarDate = function(dateStr) {
+      currentSelectedDate = dateStr;
+      renderCalendar();
+    };
+
+    function renderCalendar() {
+      const appointments = getAppointments();
+      const grid = document.getElementById("calendarGridDays");
+      if (!grid) return;
+
+      document.getElementById("calMonthYear").textContent = monthNames[currentCalMonth] + " " + currentCalYear;
+
+      const firstDayOfMonth = new Date(currentCalYear, currentCalMonth, 1).getDay();
+      const daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+      const daysInPrevMonth = new Date(currentCalYear, currentCalMonth, 0).getDate();
+
+      grid.innerHTML = "";
+
+      // Dias del mes anterior
+      for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+        const d = daysInPrevMonth - i;
+        const div = document.createElement("div");
+        div.className = "bg-white min-h-[64px] p-1 opacity-30 text-gray-400";
+        div.innerHTML = `<span class="text-[10px] font-bold block">${d}</span>`;
+        grid.appendChild(div);
+      }
+
+      // Dias del mes actual
+      for (let day = 1; day <= daysInMonth; day++) {
+        const monthPad = String(currentCalMonth + 1).padStart(2, "0");
+        const dayPad = String(day).padStart(2, "0");
+        const dateStr = `${currentCalYear}-${monthPad}-${dayPad}`;
+
+        const isToday = dateStr === "2026-11-10";
+        const isSelected = dateStr === currentSelectedDate;
+
+        const dayAppointments = appointments.filter(a => a.date === dateStr);
+
+        const div = document.createElement("div");
+        let baseClass = "min-h-[68px] p-1.5 cursor-pointer transition-all border relative flex flex-col justify-between ";
+        
+        if (isSelected) {
+          baseClass += "bg-emerald-50/70 border-2 border-[#28D070] shadow-xs ";
+        } else if (isToday) {
+          baseClass += "bg-white border-[#28D070] ";
+        } else {
+          baseClass += "bg-white hover:bg-gray-50 border-gray-100 ";
+        }
+
+        div.className = baseClass;
+        div.onclick = () => selectCalendarDate(dateStr);
+
+        let aptsHtml = "";
+        dayAppointments.slice(0, 2).forEach(apt => {
+          let badgeColor = "bg-[#28D070] text-black";
+          if (apt.service === "ITIN") badgeColor = "bg-[#139C8E] text-white";
+          if (apt.service === "Payroll") badgeColor = "bg-[#59595B] text-white";
+          aptsHtml += `<div class="p-0.5 px-1 rounded text-[9px] font-bold truncate mt-0.5 ${badgeColor}" title="${apt.time} - ${apt.name} (${apt.service})">${apt.time.split(' ')[0]} ${apt.name.split(' ')[0]}</div>`;
+        });
+
+        if (dayAppointments.length > 2) {
+          aptsHtml += `<span class="text-[8px] text-gray-500 font-bold block mt-0.5">+${dayAppointments.length - 2} mas</span>`;
+        }
+
+        const todayTag = isToday ? '<span class="text-[8px] font-extrabold text-[#28D070] ml-1 uppercase">Hoy</span>' : '';
+        div.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold ${isSelected ? 'text-[#28D070]' : (isToday ? 'text-[#28D070] font-black' : 'text-[#374151]')}">${day}</span>
+              ${todayTag}
+            </div>
+            ${aptsHtml}
+          </div>
+        `;
+        grid.appendChild(div);
+      }
+
+      renderSelectedDayPanel(appointments);
+      renderWeekList(appointments);
+    }
+
+    function renderSelectedDayPanel(appointments) {
+      const container = document.getElementById("selectedDayAppointmentsList");
+      const title = document.getElementById("selectedDateTitle");
+      if (!container) return;
+
+      const parts = currentSelectedDate.split("-");
+      const y = parseInt(parts[0]);
+      const m = parseInt(parts[1]);
+      const d = parseInt(parts[2]);
+      const dateObj = new Date(y, m - 1, d);
+      const daysOfWeek = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"];
+      const dayName = daysOfWeek[dateObj.getDay()];
+      const isToday = currentSelectedDate === "2026-11-10";
+
+      title.textContent = (isToday ? "Hoy • " : "") + `${dayName}, ${d} de ${monthNames[m - 1]}`;
+
+      const dayAppointments = appointments.filter(a => a.date === currentSelectedDate);
+
+      if (dayAppointments.length === 0) {
+        container.innerHTML = `
+          <div class="p-4 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <i class="fa-regular fa-calendar-xmark text-gray-400 text-lg mb-1 block"></i>
+            <p class="text-xs font-semibold text-[#59595B]">No hay citas agendadas para esta fecha.</p>
+            <button onclick="openNewAppointmentModal(currentSelectedDate)" class="mt-2 py-1 px-3 bg-[#28D070] hover:bg-emerald-500 text-black text-[11px] font-bold rounded-lg shadow-xs inline-flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[9px]"></i> Agendar en este dia
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = "";
+      dayAppointments.forEach(apt => {
+        const cleanPhone = apt.phone.replace(/\D/g, "");
+        const waUrl = "https://wa.me/1" + cleanPhone + "?text=" + encodeURIComponent("Hola " + apt.name + ", le recordamos su cita en Urena Tax para " + apt.service + " programada para las " + apt.time + ".");
+        
+        const card = document.createElement("div");
+        card.className = "p-3 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-2 hover:border-[#28D070] transition-colors";
+        card.innerHTML = `
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-[#1F2937]">${apt.name}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded font-bold badge-${apt.service}">${apt.service}</span>
+            </div>
+            <p class="text-[11px] text-[#59595B] flex items-center gap-1">
+              <i class="fa-regular fa-clock text-[10px] text-[#28D070]"></i> <strong>${apt.time}</strong> • ${apt.notes || 'En oficina'}
+            </p>
+          </div>
+          <div class="flex items-center gap-1">
+            <a href="${waUrl}" target="_blank" title="Confirmar por WhatsApp" class="w-7 h-7 rounded-lg bg-white border border-gray-200 hover:bg-[#28D070] hover:text-black text-[#59595B] flex items-center justify-center text-xs shadow-xs transition-colors">
+              <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+            </a>
+            <button onclick="deleteAppointment(${apt.id})" title="Cancelar Cita" class="w-7 h-7 rounded-lg bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 text-gray-400 flex items-center justify-center text-[10px] transition-colors">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderWeekList(appointments) {
+      const container = document.getElementById("weekAppointmentsList");
+      const badge = document.getElementById("weekCountBadge");
+      if (!container) return;
+
+      const weekApts = appointments.filter(a => {
+        return a.date >= "2026-11-09" && a.date <= "2026-11-15";
+      }).sort((a, b) => a.date.localeCompare(b.date));
+
+      badge.textContent = `${weekApts.length} Cita${weekApts.length === 1 ? '' : 's'}`;
+
+      if (weekApts.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-gray-400 text-center py-2">No hay citas esta semana.</p>`;
+        return;
+      }
+
+      container.innerHTML = "";
+      weekApts.forEach(apt => {
+        const parts = apt.date.split("-");
+        const y = parseInt(parts[0]);
+        const m = parseInt(parts[1]);
+        const d = parseInt(parts[2]);
+        const dateObj = new Date(y, m - 1, d);
+        const days = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"];
+        const dayLabel = `${days[dateObj.getDay()]} ${d}`;
+        const isToday = apt.date === "2026-11-10";
+
+        const item = document.createElement("div");
+        item.className = "p-2 rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-between text-[11px]";
+        item.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isToday ? 'bg-[#28D070] text-black font-black' : 'bg-white border border-gray-200 text-[#59595B]'}">${dayLabel}</span>
+            <div>
+              <span class="font-bold text-[#1F2937] block leading-tight">${apt.name}</span>
+              <span class="text-[10px] text-[#59595B]">${apt.time} • ${apt.service}</span>
+            </div>
+          </div>
+          <button onclick="selectCalendarDate('${apt.date}')" class="text-[10px] text-[#28D070] font-bold hover:underline">Ver dia</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    window.openNewAppointmentModal = function(defaultDate) {
+      document.getElementById("modalNewAppointment").classList.remove("hidden");
+      if (defaultDate) {
+        document.getElementById("aptDate").value = defaultDate;
+      } else {
+        document.getElementById("aptDate").value = currentSelectedDate || "2026-11-10";
+      }
+    };
+
+    window.closeNewAppointmentModal = function() {
+      document.getElementById("modalNewAppointment").classList.add("hidden");
+    };
+
+    window.saveNewAppointment = function() {
+      const name = document.getElementById("aptName").value.trim();
+      const phone = document.getElementById("aptPhone").value.trim();
+      const service = document.getElementById("aptService").value;
+      const date = document.getElementById("aptDate").value;
+      const time = document.getElementById("aptTime").value;
+      const notes = document.getElementById("aptNotes").value.trim();
+
+      if (!name || !date) {
+        alert("Por favor completa al menos el nombre y la fecha de la cita.");
+        return;
+      }
+
+      const list = getAppointments();
+      const newApt = {
+        id: Date.now(),
+        name,
+        phone: phone || "(551) 232-1994",
+        service,
+        date,
+        time,
+        notes: notes || "Agendado desde panel administrativo"
+      };
+
+      list.push(newApt);
+      saveAppointmentsList(list);
+      closeNewAppointmentModal();
+
+      document.getElementById("aptName").value = "";
+      document.getElementById("aptPhone").value = "";
+      document.getElementById("aptNotes").value = "";
+
+      currentSelectedDate = date;
+      renderCalendar();
+    };
+
+    window.deleteAppointment = function(id) {
+      if (!confirm("Deseas cancelar esta cita?")) return;
+      let list = getAppointments();
+      list = list.filter(a => a.id !== id);
+      saveAppointmentsList(list);
+    };
+
+    
+    // =========================================================================
+    // CONTROL DE ESTADO WHATSAPP (CONECTAR / DESCONECTAR / PRUEBA)
+    // =========================================================================
+    let isWhatsAppConnected = true;
+
+    window.openWhatsAppStatusModal = function() {
+      document.getElementById("modalWhatsAppStatus").classList.remove("hidden");
+    };
+
+    window.closeWhatsAppStatusModal = function() {
+      document.getElementById("modalWhatsAppStatus").classList.add("hidden");
+    };
+
+    window.toggleWhatsAppConnection = function() {
+      isWhatsAppConnected = !isWhatsAppConnected;
+      const statusPulse = document.getElementById("waStatusPulse");
+      const statusLabel = document.getElementById("waStatusLabel");
+      const statusIcon = document.getElementById("waStatusIcon");
+
+      const modalBox = document.getElementById("waModalStatusBox");
+      const modalPing = document.getElementById("waModalPing");
+      const modalDot = document.getElementById("waModalDot");
+      const modalStateText = document.getElementById("waModalStateText");
+      const toggleBtn = document.getElementById("waToggleConnectBtn");
+      const modalIconBg = document.getElementById("waModalIconBg");
+
+      if (isWhatsAppConnected) {
+        statusPulse.innerHTML = '<span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-[#28D070] opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-[#28D070]"></span>';
+        statusLabel.textContent = "Conectado";
+        statusLabel.className = "text-[9px] font-bold text-[#28D070] uppercase tracking-wider";
+        statusIcon.className = "fa-brands fa-whatsapp text-base text-[#28D070]";
+
+        modalBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between";
+        modalPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75";
+        modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-[#28D070]";
+        modalStateText.textContent = "Conectado y listo para envíos";
+        modalStateText.className = "text-[10px] font-bold text-[#28D070]";
+        modalIconBg.className = "w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold";
+
+        toggleBtn.innerHTML = '<i class="fa-solid fa-power-off text-xs"></i> Desconectar Línea';
+        toggleBtn.className = "w-full py-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-[#59595B] hover:text-red-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all";
+        alert("Línea WhatsApp vinculada correctamente al servidor.");
+      } else {
+        statusPulse.innerHTML = '<span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>';
+        statusLabel.textContent = "Desconectado";
+        statusLabel.className = "text-[9px] font-bold text-red-500 uppercase tracking-wider";
+        statusIcon.className = "fa-brands fa-whatsapp text-base text-gray-400";
+
+        modalBox.className = "p-3.5 rounded-xl border border-red-200 bg-red-50/60 flex items-center justify-between";
+        modalPing.className = "hidden";
+        modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
+        modalStateText.textContent = "Línea desconectada (Sin sesión)";
+        modalStateText.className = "text-[10px] font-bold text-red-500";
+        modalIconBg.className = "w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-sm font-bold";
+
+        toggleBtn.innerHTML = '<i class="fa-solid fa-link text-xs"></i> Reconectar WhatsApp';
+        toggleBtn.className = "w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-[#28D070] text-[#139C8E] font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all";
+        alert("WhatsApp desconectado. Los envíos por goteo quedarán en pausa hasta volver a conectar.");
+      }
+    };
+
+    window.sendWaTestFromModal = function() {
+      if (!isWhatsAppConnected) {
+        alert("WhatsApp se encuentra desconectado. Conéctalo primero para poder enviar una prueba.");
+        return;
+      }
+      closeWhatsAppStatusModal();
+      sendWaTest();
+    };
+
+    
+    // =========================================================================
+    // MÓDULO DE CURSOS: BASE DE DATOS, IMPORTACIÓN EXCEL Y CAMPAÑAS DE OFERTAS
+    // =========================================================================
+    const initialCourseStudents = [
+      { id: 1, name: "Maria Elena Rodriguez", phone: "(551) 234-9988", email: "maria.elena@gmail.com", course: "Online", status: "Oferta Enviada", origin: "Stan Store (Web)", date: "09 Nov 2026" },
+      { id: 2, name: "Jose Ramon Castillo", phone: "(973) 881-2244", email: "jcastillo_taxes@yahoo.com", course: "Presencial", status: "Cupo Reservado", origin: "Excel Importado", date: "08 Nov 2026" },
+      { id: 3, name: "Luisa Fernanda Santos", phone: "(201) 445-6677", email: "luisa.santos@outlook.com", course: "Interesado", status: "Pendiente Oferta", origin: "Excel Importado", date: "07 Nov 2026" },
+      { id: 4, name: "Alexander Batista", phone: "(973) 992-1133", email: "alex.batista@gmail.com", course: "Online", status: "Inscrito", origin: "Stan Store (Web)", date: "05 Nov 2026" }
+    ];
+
+    function getCourseStudents() {
+      const stored = localStorage.getItem("urena_courses_students_v1");
+      if (!stored) {
+        localStorage.setItem("urena_courses_students_v1", JSON.stringify(initialCourseStudents));
+        return initialCourseStudents;
+      }
+      try {
+        return JSON.parse(stored);
+      } catch(e) {
+        return initialCourseStudents;
+      }
+    }
+
+    function saveCourseStudents(list) {
+      localStorage.setItem("urena_courses_students_v1", JSON.stringify(list));
+      renderCoursesTable();
+    }
+
+    function renderCoursesTable() {
+      const list = getCourseStudents();
+      const tbody = document.getElementById("coursesTableBody");
+      const filter = document.getElementById("courseTypeFilter") ? document.getElementById("courseTypeFilter").value : "all";
+      if (!tbody) return;
+
+      const filtered = list.filter(item => {
+        if (filter === "all") return true;
+        return item.course === filter;
+      });
+
+      document.getElementById("coursesTotalBadge").textContent = `${filtered.length} Contacto${filtered.length === 1 ? '' : 's'}`;
+
+      tbody.innerHTML = "";
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400 font-semibold">No hay contactos registrados en esta categoría. Puedes subir un archivo de Excel para importarlos.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(st => {
+        const cleanPhone = st.phone.replace(/\D/g, "");
+        const waMsg = encodeURIComponent(`Hola ${st.name}! Le escribimos de Urena Tax sobre el Curso de Taxes. ¿Desea aprovechar el descuento especial de temporada?`);
+        const waUrl = "https://wa.me/1" + cleanPhone + "?text=" + waMsg;
+
+        let badgeBg = "bg-emerald-50 text-[#28D070] border-emerald-200";
+        if (st.course === "Presencial") badgeBg = "bg-gray-100 text-[#59595B] border-gray-200";
+        if (st.course === "Interesado") badgeBg = "bg-amber-50 text-amber-700 border-amber-200";
+
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50 transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 px-4 font-semibold text-[#1F2937]">
+            <span class="block">${st.name}</span>
+            <span class="text-[10px] text-gray-400 font-normal">${st.email}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <a href="tel:+1${cleanPhone}" class="text-[#374151] hover:text-[#28D070] font-medium flex items-center gap-1">
+              <i class="fa-solid fa-phone text-[9px] text-gray-400"></i> ${st.phone}
+            </a>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="inline-block py-0.5 px-2 rounded-full text-[10px] font-bold border ${badgeBg}">
+              ${st.course}
+            </span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="text-xs font-semibold text-[#1F2937]">${st.status}</span>
+          </td>
+          <td class="py-2.5 px-3 text-[#59595B]">
+            <span class="text-xs block">${st.origin}</span>
+            <span class="text-[10px] text-gray-400">${st.date}</span>
+          </td>
+          <td class="py-2.5 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <a href="${waUrl}" target="_blank" title="Enviar WhatsApp Directo" class="w-7 h-7 rounded-lg bg-emerald-50 hover:bg-[#28D070] hover:text-black text-[#28D070] font-bold flex items-center justify-center transition-colors">
+                <i class="fa-brands fa-whatsapp text-xs"></i>
+              </a>
+              <button onclick="deleteCourseStudent(${st.id})" title="Eliminar de la lista" class="w-7 h-7 rounded-lg bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-600 flex items-center justify-center text-xs transition-colors">
+                <i class="fa-solid fa-trash-can text-[10px]"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.deleteCourseStudent = function(id) {
+      if (!confirm("¿Deseas eliminar este registro de la lista de cursos?")) return;
+      let list = getCourseStudents();
+      list = list.filter(item => item.id !== id);
+      saveCourseStudents(list);
+    };
+
+    window.handleExcelUpload = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Simulación de lectura de Excel y carga en la base de datos
+      const list = getCourseStudents();
+      const mockImported = [
+        { id: Date.now() + 1, name: "Cristian Paulino", phone: "(551) 887-1122", email: "cpaulino@gmail.com", course: "Interesado", status: "Importado de Excel", origin: `Excel (${file.name})`, date: "Hoy" },
+        { id: Date.now() + 2, name: "Glendy Morales", phone: "(201) 674-5500", email: "glendy.m@yahoo.com", course: "Online", status: "Importado de Excel", origin: `Excel (${file.name})`, date: "Hoy" },
+        { id: Date.now() + 3, name: "Nelson Rosario", phone: "(973) 334-7788", email: "nelson.taxes@outlook.com", course: "Presencial", status: "Importado de Excel", origin: `Excel (${file.name})`, date: "Hoy" }
+      ];
+
+      mockImported.forEach(item => list.unshift(item));
+      saveCourseStudents(list);
+
+      alert(`✅ Archivo Excel "${file.name}" procesado con éxito.\n\nSe importaron 3 nuevos contactos con teléfono y correo a la base de datos de cursos.`);
+      e.target.value = "";
+    };
+
+    window.downloadSampleExcel = function() {
+      const csvContent = "data:text/csv;charset=utf-8," + 
+        "Nombre,Telefono,Email,Modalidad,Interes\n" +
+        "Juan Perez,(551) 000-1111,juan@example.com,Online,Descuento 15%\n" +
+        "Maria Lopez,(201) 222-3333,maria@example.com,Presencial,Taller Paterson\n" +
+        "Carlos Diaz,(973) 444-5555,carlos@example.com,Interesado,Temporada 2026";
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "plantilla_alumnos_urena_tax.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    window.openCourseBroadcastModal = function() {
+      document.getElementById("modalCourseBroadcast").classList.remove("hidden");
+    };
+
+    window.closeCourseBroadcastModal = function() {
+      document.getElementById("modalCourseBroadcast").classList.add("hidden");
+    };
+
+    window.sendCourseTestOffer = function() {
+      const email = prompt("Ingresa tu correo para recibir la vista previa de la oferta del curso:", "admin@urenatax.com");
+      if (!email) return;
+      const subj = document.getElementById("courseBroadcastSubject").value;
+      alert(`✅ Prueba de oferta enviada a: ${email}\n\nAsunto: ${subj}\n\nCupón TAXES2026 y enlaces a Stan Store validados.`);
+    };
+
+    window.startCourseBroadcast = function() {
+      const channel = document.getElementById("courseBroadcastChannel").value;
+      const target = document.getElementById("courseBroadcastTarget").value;
+      const total = getCourseStudents().length;
+      alert(`🚀 Campaña de Ofertas de Cursos Iniciada:\n\n• Canal: ${channel.toUpperCase()}\n• Destinatarios: ${total} alumnos/prospectos de la base\n• Modo: Envío por goteo con pausas de seguridad activas.`);
+      closeCourseBroadcastModal();
+    };
+
+    renderCoursesTable();
+    renderCalendar();
+    renderLeads();
+  </script>
+</body>
+</html>
