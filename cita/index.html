@@ -45,6 +45,14 @@
       pointer-events: none;
     }
   </style>
+  <!-- Supabase Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.SUPABASE_URL = "https://iqnigpsrmfiiydxyietl.supabase.co";
+    window.SUPABASE_ANON = "sb_publishable_bQ8QtLiqktNlmpfBUzyDXg_gjn5JY2h";
+    window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+  </script>
+
 </head>
 <body class="min-h-screen flex items-center justify-center p-3 sm:p-6 antialiased text-[#1F2937]">
 
@@ -330,6 +338,29 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando Cita...';
 
       setTimeout(() => {
+        // GUARDAR EN SUPABASE REALTIME CLOUD
+        if (window.supabaseClient) {
+          window.supabaseClient.from("leads").insert([{
+            name: name,
+            phone: phone,
+            email: email || "No indicado",
+            service: service,
+            message: `[Postcard QR Volante] Fecha: ${date} a las ${time}. Nota: ${notes || "Sin notas"}`,
+            source: "Flyer QR",
+            status: "Nuevo"
+          }]).then(res => console.log("Lead guardado en Supabase:", res));
+
+          window.supabaseClient.from("appointments").insert([{
+            name: name,
+            phone: phone,
+            service: service,
+            appointment_date: date,
+            appointment_time: time,
+            notes: `[Postcard 10% OFF] ${notes || "Cita generada desde tarjeta interactiva"}`,
+            status: "Confirmada"
+          }]).then(res => console.log("Cita guardada en Supabase:", res));
+        }
+
         // 1. GUARDAR EN LEAD (localStorage urena_crm_final_v4)
         const leadsKey = "urena_crm_final_v4";
         let leads = [];

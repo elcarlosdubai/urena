@@ -55,6 +55,14 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
   </style>
+  <!-- Supabase Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.SUPABASE_URL = "https://iqnigpsrmfiiydxyietl.supabase.co";
+    window.SUPABASE_ANON = "sb_publishable_bQ8QtLiqktNlmpfBUzyDXg_gjn5JY2h";
+    window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+  </script>
+
 </head>
 <body class="bg-[#F4F5F6] text-[#1F2937] antialiased flex flex-col md:flex-row h-screen overflow-hidden text-sm">
 
@@ -1157,6 +1165,80 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         toggleMobileMenu();
       }
     }
+
+    
+    // SINCRONIZACIÓN SUPABASE EN TIEMPO REAL
+    async function syncSupabaseData() {
+      if (!window.supabaseClient) return;
+
+      // 1. Cargar Leads desde Supabase
+      try {
+        const { data: cloudLeads, error } = await window.supabaseClient
+          .from("leads")
+          .select("*")
+          .order("id", { ascending: false });
+
+        if (!error && cloudLeads && cloudLeads.length > 0) {
+          const formatted = cloudLeads.map(l => ({
+            id: l.id,
+            name: l.name,
+            phone: l.phone,
+            email: l.email || "No indicado",
+            service: l.service || "Taxes",
+            message: l.message || "Sin mensaje",
+            date: new Date(l.created_at).toLocaleDateString(),
+            status: l.status || "Nuevo"
+          }));
+          localStorage.setItem("urena_crm_final_v4", JSON.stringify(formatted));
+          renderLeads();
+        }
+      } catch(e) {
+        console.warn("Supabase Leads Sync warning:", e);
+      }
+
+      // 2. Cargar Citas desde Supabase
+      try {
+        const { data: cloudApts, error: errApts } = await window.supabaseClient
+          .from("appointments")
+          .select("*")
+          .order("id", { ascending: false });
+
+        if (!errApts && cloudApts && cloudApts.length > 0) {
+          const formattedApts = cloudApts.map(a => ({
+            id: a.id,
+            name: a.name,
+            phone: a.phone,
+            service: a.service || "Taxes",
+            date: a.appointment_date,
+            time: a.appointment_time,
+            notes: a.notes || "Sin notas"
+          }));
+          localStorage.setItem("urena_appointments_v1", JSON.stringify(formattedApts));
+          renderCalendar();
+          renderAppointmentsList();
+        }
+      } catch(e) {
+        console.warn("Supabase Appointments Sync warning:", e);
+      }
+
+      // 3. Escuchar inserciones en Tiempo Real (Realtime WebSockets)
+      try {
+        window.supabaseClient
+          .channel("realtime-urena")
+          .on("postgres_changes", { event: "INSERT", schema: "public", table: "leads" }, payload => {
+            console.log("¡Nuevo Lead en Tiempo Real!", payload);
+            syncSupabaseData();
+          })
+          .on("postgres_changes", { event: "INSERT", schema: "public", table: "appointments" }, payload => {
+            console.log("¡Nueva Cita en Tiempo Real!", payload);
+            syncSupabaseData();
+          })
+          .subscribe();
+      } catch(e) {}
+    }
+
+    // Ejecutar sinc al cargar
+    setTimeout(syncSupabaseData, 300);
 
     function renderLeads() {
       const leads = getLeads();
