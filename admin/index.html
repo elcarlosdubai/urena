@@ -1347,13 +1347,26 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
     window.changeStatus = function(id, st) {
       const leads = getLeads();
       const item = leads.find(l => l.id === id);
-      if (item) { item.status = st; saveLeads(leads); }
+      if (item) { 
+        item.status = st; 
+        saveLeads(leads);
+        if (window.supabaseClient) {
+          window.supabaseClient.from("leads").update({ status: st }).eq("id", id).then(() => {
+            console.log("Status actualizado en Supabase:", id, st);
+          });
+        }
+      }
     };
 
     window.removeLead = function(id) {
       if (confirm("¿Deseas archivar este contacto?")) {
         const leads = getLeads().filter(l => l.id !== id);
         saveLeads(leads);
+        if (window.supabaseClient) {
+          window.supabaseClient.from("leads").delete().eq("id", id).then(() => {
+            console.log("Lead eliminado de Supabase:", id);
+          });
+        }
       }
     };
 
