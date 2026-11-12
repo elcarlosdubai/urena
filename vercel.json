@@ -1,6 +1,64 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/citas",
+      "destination": "/cita/index.html"
+    },
+    {
+      "source": "/citas/(.*)",
+      "destination": "/cita/index.html"
+    },
+    {
+      "source": "/cita",
+      "destination": "/cita/index.html"
+    },
+    {
+      "source": "/cita/(.*)",
+      "destination": "/cita/index.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/contact/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/contacto",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/contacto/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/servicios/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/services/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/itin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/itin/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/aboutus",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

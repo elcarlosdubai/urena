@@ -71,7 +71,7 @@ Error generating stack: `+s.message+`
                   ${o&&r&&"text-white"}
                   ${o&&!r&&"text-green"}
                   ${!o&&r&&"text-green"}
-                  ${!o&&!r&&"text-white font-extrabold"}
+                  ${!o&&!r&&"text-black font-extrabold"}
                   ${l&&"opacity-50 cursor-not-allowed"}
                   ${c&&o&&"hover:brightness-110"} 
                   ${c&&!o&&" bg-green-light"}
