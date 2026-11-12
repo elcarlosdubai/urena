@@ -592,6 +592,9 @@
         // 3. MOSTRAR CONFIRMACIÓN
         document.getElementById("qrBookingForm").classList.add("hidden");
         document.getElementById("reversoSuccessCard").classList.remove("hidden");
+        // Ocultar botón superior de volver cuando ya la cita está confirmada
+        const volverBtn = document.querySelector("button[onclick='flipPostcard(false)']");
+        if (volverBtn) volverBtn.style.display = "none";
 
                 // 4. ENCOLAR MENSAJE EN LA COLA UNIFICADA (EMAIL & WHATSAPP BAILEYS)
         const waText = `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;

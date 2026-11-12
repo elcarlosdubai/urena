@@ -220,14 +220,13 @@
         <!-- WhatsApp Conectado en Vivo (Clickeable con Modal de Estado) -->
         <button onclick="openWhatsAppStatusModal()" id="waHeaderBtn" class="bg-white hover:bg-gray-50 border border-gray-200 py-1.5 px-3.5 rounded-xl flex items-center gap-2.5 shadow-xs transition-all cursor-pointer text-left">
           <div id="waStatusPulse" class="relative flex items-center justify-center">
-            <span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-[#28D070] opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#28D070]"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
           </div>
           <div class="flex items-center gap-1.5">
-            <i id="waStatusIcon" class="fa-brands fa-whatsapp text-base text-[#28D070]"></i>
+            <i id="waStatusIcon" class="fa-brands fa-whatsapp text-base text-amber-500"></i>
             <div class="leading-none">
               <span class="text-xs font-bold text-[#1F2937] block">(551) 232-1994</span>
-              <span id="waStatusLabel" class="text-[9px] font-bold text-[#28D070] uppercase tracking-wider">Conectado</span>
+              <span id="waStatusLabel" class="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Conectar Baileys</span>
             </div>
           </div>
         </button>
@@ -1179,12 +1178,12 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
     <div class="bg-white rounded-2xl w-full max-w-sm p-5 border border-gray-200 shadow-xl space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
         <div class="flex items-center gap-2">
-          <div id="waModalIconBg" class="w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold">
+          <div id="waModalIconBg" class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">
             <i class="fa-brands fa-whatsapp text-lg"></i>
           </div>
           <div>
             <h3 class="text-xs font-bold text-[#1F2937]">Servidor WhatsApp Baileys</h3>
-            <p id="waModalSubtitle" class="text-[10px] text-gray-400">Sesión activa • Línea Oficial</p>
+            <p id="waModalSubtitle" class="text-[10px] text-gray-400">Node.js Engine • Línea Oficial</p>
           </div>
         </div>
         <button onclick="closeWhatsAppStatusModal()" class="text-gray-400 hover:text-black w-6 h-6 flex items-center justify-center rounded-lg hover:bg-gray-100">
@@ -1193,28 +1192,41 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
       </div>
 
       <!-- Estado Central -->
-      <div id="waModalStatusBox" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between">
+      <div id="waModalStatusBox" class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/60 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <span class="relative flex h-3 w-3">
-            <span id="waModalPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75"></span>
-            <span id="waModalDot" class="relative inline-flex rounded-full h-3 w-3 bg-[#28D070]"></span>
+            <span id="waModalDot" class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
           </span>
           <div>
             <span class="text-xs font-bold text-[#1F2937] block">+1 (551) 232-1994</span>
-            <span id="waModalStateText" class="text-[10px] font-bold text-[#28D070]">Conectado y listo para envíos</span>
+            <span id="waModalStateText" class="text-[10px] font-bold text-amber-700">En espera de enlace QR</span>
           </div>
         </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-gray-200 text-[#59595B]">En línea</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-amber-200 text-amber-800">Baileys</span>
+      </div>
+
+      <!-- Contenedor para escanear QR -->
+      <div id="baileysQrContainer" class="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-center space-y-2">
+        <p class="text-[11px] font-bold text-[#1F2937]">Vincular WhatsApp de la Oficina</p>
+        <p class="text-[10px] text-[#59595B] leading-tight">Abre WhatsApp en tu teléfono > Dispositivos vinculados > Vincular un dispositivo.</p>
+        <div class="flex justify-center py-2">
+          <div id="baileysQrPlaceholder" class="w-36 h-36 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-1.5 shadow-xs">
+            <img id="baileysQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.urenatax.com&color=1F2937" class="w-full h-full object-contain" alt="QR Baileys" />
+          </div>
+        </div>
+        <button onclick="checkBaileysServerStatus()" class="py-1 px-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg text-[10px] font-bold text-[#59595B]">
+          <i class="fa-solid fa-arrows-rotate"></i> Actualizar QR
+        </button>
       </div>
 
       <!-- Acciones del Modal -->
       <div class="space-y-2 pt-1">
         <button onclick="sendWaTestFromModal()" class="w-full py-2.5 bg-[#28D070] hover:bg-emerald-500 font-bold text-black rounded-xl text-xs shadow-xs flex items-center justify-center gap-2 transition-all">
-          <i class="fa-brands fa-whatsapp text-sm"></i> Enviar Mensaje de Prueba
+          <i class="fa-brands fa-whatsapp text-sm"></i> Enviar WhatsApp de Prueba
         </button>
 
         <button id="waToggleConnectBtn" onclick="toggleWhatsAppConnection()" class="w-full py-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-[#59595B] hover:text-red-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
-          <i class="fa-solid fa-power-off text-xs"></i> Desconectar Línea
+          <i class="fa-solid fa-power-off text-xs"></i> Reiniciar Sesión Baileys
         </button>
       </div>
     </div>
@@ -2057,7 +2069,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
         modalBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between";
         modalPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75";
         modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-[#28D070]";
-        modalStateText.textContent = "Conectado y listo para envíos";
+        modalStateText.textContent = "Servicio Baileys en espera de enlace QR";
         modalStateText.className = "text-[10px] font-bold text-[#28D070]";
         modalIconBg.className = "w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold";
 
@@ -2634,6 +2646,37 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     // Inicializar la cola unificada al cargar la página
     document.addEventListener("DOMContentLoaded", () => {
       renderUnifiedQueue();
+    });
+
+  
+    // =========================================================================
+    // COMUNICACIÓN CON SERVICIO BAILEYS (NAMECHEAP / NODE.JS)
+    // =========================================================================
+    async function checkBaileysServerStatus() {
+      const baileysUrl = localStorage.getItem("baileys_service_url") || "http://localhost:3001";
+      try {
+        const res = await fetch(`${baileysUrl}/status`, { signal: AbortSignal.timeout(3000) });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "open") {
+            document.getElementById("waStatusLabel").textContent = "Conectado";
+            document.getElementById("waStatusLabel").className = "text-[9px] font-bold text-emerald-600 uppercase tracking-wider";
+            document.getElementById("waStatusIcon").className = "fa-brands fa-whatsapp text-base text-emerald-600";
+            document.getElementById("waModalStateText").textContent = "Línea Vinculada y Activa";
+            document.getElementById("waModalStateText").className = "text-[10px] font-bold text-emerald-700";
+            document.getElementById("baileysQrContainer").classList.add("hidden");
+          } else if (data.qr) {
+            document.getElementById("baileysQrImg").src = data.qr;
+            document.getElementById("baileysQrContainer").classList.remove("hidden");
+          }
+        }
+      } catch (e) {
+        console.log("Servicio Baileys en espera de iniciar en Namecheap:", e.message);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      checkBaileysServerStatus();
     });
 
   </script>
