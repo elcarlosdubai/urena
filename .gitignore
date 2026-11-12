@@ -1,0 +1,6 @@
+node_modules/
+.env
+.DS_Store
+baileys-service/node_modules/
+baileys-service/auth_info_baileys/
+baileys-service/.env

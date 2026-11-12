@@ -77,7 +77,7 @@
         <div class="bg-white p-3 rounded-2xl inline-block shadow-sm mb-2">
           <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="h-10 w-auto" />
         </div>
-        <h2 class="text-xl font-black mt-1">Panel de Control Operativo</h2>
+        <h2 class="text-xl font-black mt-1">Panel Administrativo</h2>
         <p class="text-xs font-semibold text-black/80 mt-1">Ureña Tax & Accounting Services • Paterson, NJ</p>
       </div>
 
@@ -88,17 +88,17 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-[#59595B] uppercase mb-1.5">Usuario o Correo Oficial</label>
+          <label class="block text-xs font-bold text-[#59595B] uppercase mb-1.5">Usuario</label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
               <i class="fa-solid fa-user text-sm"></i>
             </span>
-            <input required type="text" id="loginUser" placeholder="admin@urenatax.com" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-[#1F2937] focus:ring-2 focus:ring-[#28D070] focus:outline-none" />
+            <input required type="text" id="loginUser" placeholder="Ingresa tu usuario o correo" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-[#1F2937] focus:ring-2 focus:ring-[#28D070] focus:outline-none" />
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-[#59595B] uppercase mb-1.5">Contraseña de Seguridad</label>
+          <label class="block text-xs font-bold text-[#59595B] uppercase mb-1.5">Contraseña</label>
           <div class="relative">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
               <i class="fa-solid fa-lock text-sm"></i>
@@ -112,7 +112,7 @@
             <input type="checkbox" id="rememberSession" checked class="rounded text-[#28D070] focus:ring-[#28D070]" />
             Recordar sesión
           </label>
-          <span class="text-gray-400 text-[11px]">Sistema Encriptado 256-bit</span>
+          
         </div>
 
         <button type="submit" id="loginSubmitBtn" class="w-full py-3.5 bg-[#28D070] hover:bg-emerald-500 text-black font-black text-sm rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 mt-4">
@@ -191,13 +191,17 @@
       </nav>
     </div>
 
-    <!-- Botón directo a la web -->
-    <div class="p-3 border-t border-gray-100">
+    <!-- Botón directo a la web y Cerrar Sesión -->
+    <div class="p-3 border-t border-gray-100 space-y-2">
       <a href="/" target="_blank" class="w-full py-2 px-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-[#59595B] hover:text-black flex items-center justify-between transition-colors">
         <span class="flex items-center gap-2">
           <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-[#28D070]"></i> Ver Web Pública
         </span>
       </a>
+      <button type="button" onclick="handleAdminLogout()" class="w-full py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg text-xs font-bold text-red-600 flex items-center gap-2 transition-colors cursor-pointer">
+        <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
+        <span>Cerrar Sesión</span>
+      </button>
     </div>
   </aside>
 
@@ -208,15 +212,10 @@
     <header class="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between flex-shrink-0">
       <div>
         <h1 id="topbarTitle" class="text-base font-bold text-[#1F2937] leading-tight">Lead</h1>
-        <p class="text-[10px] text-gray-400">Urena Tax • Control Operativo de Clientes</p>
+        <p class="text-[10px] text-gray-400">Urena Tax • Panel Administrativo</p>
       </div>
 
       <div class="flex items-center gap-2.5">
-        <button onclick="simulateLead()" class="py-1.5 px-3 bg-[#28D070] hover:bg-emerald-500 text-black font-bold text-[11px] rounded-lg shadow-xs flex items-center gap-1.5 transition-all">
-          <i class="fa-solid fa-plus text-[10px]"></i>
-          <span>Simular Cliente Web</span>
-        </button>
-
         <!-- WhatsApp Conectado en Vivo (Clickeable con Modal de Estado) -->
         <button onclick="openWhatsAppStatusModal()" id="waHeaderBtn" class="bg-white hover:bg-gray-50 border border-gray-200 py-1.5 px-3.5 rounded-xl flex items-center gap-2.5 shadow-xs transition-all cursor-pointer text-left">
           <div id="waStatusPulse" class="relative flex items-center justify-center">
@@ -225,8 +224,8 @@
           <div class="flex items-center gap-1.5">
             <i id="waStatusIcon" class="fa-brands fa-whatsapp text-base text-amber-500"></i>
             <div class="leading-none">
-              <span class="text-xs font-bold text-[#1F2937] block">(551) 232-1994</span>
-              <span id="waStatusLabel" class="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Conectar Baileys</span>
+              <span id="waHeaderNumber" class="text-xs font-bold text-[#1F2937] block">WhatsApp</span>
+              <span id="waStatusLabel" class="text-[9px] font-bold text-amber-600 uppercase tracking-wider">Conectar WhatsApp</span>
             </div>
           </div>
         </button>
@@ -446,22 +445,14 @@
       <!-- ========================================================================= -->
       <section id="tab-queue" class="hidden space-y-5">
         
-        <!-- TÍTULO GRANDE -->
+        <!-- CABECERA LIMPIA -->
         <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-[10px] font-black uppercase tracking-wider rounded-md flex items-center gap-1.5">
-                <i class="fa-solid fa-server"></i> Dispatch Engine Activo
-              </span>
-              <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider rounded-md flex items-center gap-1.5">
-                <i class="fa-brands fa-whatsapp"></i> Baileys Ready
-              </span>
-            </div>
-            <h1 class="text-xl sm:text-2xl font-black text-[#1F2937] mt-2 tracking-tight">
-              Cola de Mensajes Activa (WhatsApp & Baileys / Email Queue)
+            <h1 class="text-lg sm:text-xl font-black text-[#1F2937] tracking-tight">
+              Historial y Cola de Mensajes
             </h1>
-            <p class="text-xs text-[#59595B] mt-1 font-medium">
-              Todos los mensajes salientes generados por la plataforma (Confirmaciones de citas, WhatsApps automáticos vía Baileys y Correos SMTP) se procesan en esta cola unificada.
+            <p class="text-xs text-[#59595B] mt-0.5 font-medium">
+              Correos y WhatsApps enviados, pendientes o con error.
             </p>
           </div>
 
@@ -475,46 +466,61 @@
           </div>
         </div>
 
-        <!-- TARJETAS DE ESTADÍSTICAS DE LA COLA -->
+        <!-- TARJETAS DE ESTADÍSTICAS INTERACTIVAS (CLICKEABLES PARA FILTRAR) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-gray-400">Total en Cola</p>
+          <button type="button" onclick="filterQueueStatus('all')" id="qCard-all" class="bg-white border-2 border-[#28D070] rounded-xl p-3.5 text-center shadow-xs hover:shadow-md transition-all cursor-pointer">
+            <p class="text-[10px] uppercase font-bold text-gray-500">Total en Log</p>
             <p id="qStatTotal" class="text-2xl font-black text-[#1F2937]">0</p>
-            <p class="text-[9px] text-gray-400 font-bold mt-0.5">WhatsApp + Email</p>
-          </div>
+            <p class="text-[9px] text-gray-400 font-bold mt-0.5">Historial + Pendientes</p>
+          </button>
 
-          <div class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-emerald-600">Pendientes WhatsApp (Baileys)</p>
-            <p id="qStatWa" class="text-2xl font-black text-emerald-600">0</p>
-            <p class="text-[9px] text-emerald-600 font-bold mt-0.5">Listos para despachar</p>
-          </div>
+          <button type="button" onclick="filterQueueStatus('Pendiente')" id="qCard-Pendiente" class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs hover:border-amber-400 hover:shadow-md transition-all cursor-pointer">
+            <p class="text-[10px] uppercase font-bold text-amber-600">Pendientes</p>
+            <p id="qStatPending" class="text-2xl font-black text-amber-600">0</p>
+            <p id="qStatPendingBreak" class="text-[9px] text-amber-600 font-bold mt-0.5">0 WA • 0 Email</p>
+          </button>
 
-          <div class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-sky-600">Pendientes Email (SMTP)</p>
-            <p id="qStatEmail" class="text-2xl font-black text-sky-600">0</p>
-            <p class="text-[9px] text-sky-600 font-bold mt-0.5">premium45.web-hosting</p>
-          </div>
+          <button type="button" onclick="filterQueueStatus('Enviado')" id="qCard-Enviado" class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer">
+            <p class="text-[10px] uppercase font-bold text-emerald-600">Enviados</p>
+            <p id="qStatSent" class="text-2xl font-black text-emerald-600">0</p>
+            <p class="text-[9px] text-emerald-600 font-bold mt-0.5">Entregados con éxito</p>
+          </button>
 
-          <div class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-gray-400">Despachados Hoy</p>
-            <p id="qStatSent" class="text-2xl font-black text-gray-700">18</p>
-            <p class="text-[9px] text-[#28D070] font-bold mt-0.5">100% Entregados</p>
-          </div>
+          <button type="button" onclick="filterQueueStatus('Fallido')" id="qCard-Fallido" class="bg-white border border-gray-200 rounded-xl p-3.5 text-center shadow-xs hover:border-red-400 hover:shadow-md transition-all cursor-pointer">
+            <p class="text-[10px] uppercase font-bold text-red-600">Fallidos / Error</p>
+            <p id="qStatFailed" class="text-2xl font-black text-red-600">0</p>
+            <p class="text-[9px] text-red-500 font-bold mt-0.5">Clic para ver errores</p>
+          </button>
         </div>
 
-        <!-- TABLA PRINCIPAL DE LA COLA UNIFICADA -->
+        <!-- TABLA PRINCIPAL DE LA COLA & LOG UNIFICADO -->
         <div class="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
-          <div class="p-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <h3 class="font-extrabold text-sm text-[#1F2937]">Mensajes en Espera de Salida</h3>
+          <div class="p-4 border-b border-gray-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-extrabold text-sm text-[#1F2937]">Log de Envíos y Cola</h3>
               <span id="qTableBadge" class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">0 en espera</span>
             </div>
             
-            <!-- Filtros de canal -->
-            <div class="flex items-center gap-2">
-              <button onclick="filterQueue('all')" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-[#28D070] text-black">Todos</button>
-              <button onclick="filterQueue('whatsapp')" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-gray-100 text-[#59595B] hover:text-black">WhatsApp (Baileys)</button>
-              <button onclick="filterQueue('email')" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-gray-100 text-[#59595B] hover:text-black">Email</button>
+            <div class="flex items-center gap-2 flex-wrap">
+              <!-- Buscador -->
+              <div class="relative">
+                <i class="fa-solid fa-magnifying-glass text-gray-400 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="queueSearchInput" oninput="onQueueSearch(this.value)" placeholder="Buscar nombre, correo, error..." class="pl-8 pr-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-[#28D070] w-48 sm:w-56">
+              </div>
+
+              <!-- Filtros de canal -->
+              <div class="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+                <button type="button" onclick="filterQueue('all')" id="qChan-all" class="px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#28D070] text-black transition-colors">Todos</button>
+                <button type="button" onclick="filterQueue('whatsapp')" id="qChan-whatsapp" class="px-2.5 py-1 text-[11px] font-bold rounded-md text-[#59595B] hover:text-black transition-colors">WhatsApp</button>
+                <button type="button" onclick="filterQueue('email')" id="qChan-email" class="px-2.5 py-1 text-[11px] font-bold rounded-md text-[#59595B] hover:text-black transition-colors">Email</button>
+              </div>
+
+              <!-- Cantidad por página -->
+              <select id="queuePageSizeSelect" onchange="changeQueuePageSize(this.value)" class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-bold bg-white" title="Registros por página">
+                <option value="10" selected>10 / pág</option>
+                <option value="25">25 / pág</option>
+                <option value="50">50 / pág</option>
+              </select>
             </div>
           </div>
 
@@ -524,11 +530,11 @@
                 <tr class="bg-gray-50 border-b border-gray-100 text-[10px] font-bold uppercase text-[#59595B]">
                   <th class="py-3 px-4">Canal</th>
                   <th class="py-3 px-4">Destinatario</th>
-                  <th class="py-3 px-4">Contacto (Tel / Correo)</th>
-                  <th class="py-3 px-4">Mensaje / Asunto</th>
+                  <th class="py-3 px-4">Contacto</th>
+                  <th class="py-3 px-4">Mensaje / Asunto / Detalle</th>
                   <th class="py-3 px-4">Estado</th>
-                  <th class="py-3 px-4">Fecha / Entrada</th>
-                  <th class="py-3 px-4 text-center">Acción</th>
+                  <th class="py-3 px-4">Fecha / Hora</th>
+                  <th class="py-3 px-4 text-center">Acciones</th>
                 </tr>
               </thead>
               <tbody id="unifiedQueueTbody" class="divide-y divide-gray-100 text-xs text-[#1F2937]">
@@ -536,8 +542,75 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Paginación -->
+          <div class="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+            <p id="queuePaginationInfo" class="text-gray-500 font-medium">Mostrando 0 de 0 registros</p>
+            <div class="flex items-center gap-1.5">
+              <button type="button" onclick="changeQueuePage(-1)" id="qPrevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                « Anterior
+              </button>
+              <span id="qPageIndicator" class="px-3 py-1.5 font-extrabold text-gray-700">Página 1 de 1</span>
+              <button type="button" onclick="changeQueuePage(1)" id="qNextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 bg-white font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed">
+                Siguiente »
+              </button>
+            </div>
+          </div>
         </div>
 
+        <!-- MODAL DE EDICIÓN DE MENSAJE EN COLA / LOG -->
+        <div id="editQueueModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+              <h3 class="font-black text-base text-[#1F2937]">Editar Registro / Reintentar Envío</h3>
+              <button type="button" onclick="closeEditQueueModal()" class="text-gray-400 hover:text-gray-700 text-lg font-bold">✕</button>
+            </div>
+            <div class="p-5 space-y-3.5 text-xs">
+              <input type="hidden" id="editQId">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-gray-600 mb-1">Canal</label>
+                  <select id="editQChannel" class="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold bg-white">
+                    <option value="email">Correo Electrónico</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-600 mb-1">Estado</label>
+                  <select id="editQStatus" class="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold bg-white">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Enviado">Enviado</option>
+                    <option value="Fallido">Fallido</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-gray-600 mb-1">Destinatario</label>
+                  <input type="text" id="editQRecipient" class="w-full border border-gray-200 rounded-xl px-3 py-2">
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-600 mb-1">Contacto (Correo o Teléfono)</label>
+                  <input type="text" id="editQContact" class="w-full border border-gray-200 rounded-xl px-3 py-2 font-mono">
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-gray-600 mb-1">Asunto</label>
+                <input type="text" id="editQSubject" class="w-full border border-gray-200 rounded-xl px-3 py-2">
+              </div>
+              <div>
+                <label class="block font-bold text-gray-600 mb-1">Mensaje</label>
+                <textarea id="editQMessage" rows="4" class="w-full border border-gray-200 rounded-xl px-3 py-2"></textarea>
+              </div>
+              <div id="editQErrorBox" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-[11px]"></div>
+            </div>
+            <div class="px-5 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-2">
+              <button type="button" onclick="closeEditQueueModal()" class="px-4 py-2 rounded-xl border border-gray-200 bg-white font-bold text-xs text-gray-600 hover:bg-gray-100">Cancelar</button>
+              <button type="button" onclick="saveEditQueueModal(false)" class="px-4 py-2 rounded-xl bg-gray-900 hover:bg-black text-white font-bold text-xs">Guardar Cambios</button>
+              <button type="button" onclick="saveEditQueueModal(true)" class="px-4 py-2 rounded-xl bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold text-xs">Guardar y Enviar</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- ========================================================================= -->
@@ -702,7 +775,7 @@
             <p class="text-[9px] text-emerald-600 font-bold">100% Entregabilidad</p>
           </div>
           <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-gray-400">Servidor SMTP</p>
+            <p class="text-[10px] uppercase font-bold text-gray-400">Estado de Envío</p>
             <p class="text-sm font-black text-emerald-600 mt-1">contact@urenatax...</p>
             <p class="text-[9px] text-gray-400">Autenticado SPF / DKIM</p>
           </div>
@@ -1069,7 +1142,7 @@ Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson,
                   <p class="text-[10px] text-[#59595B] leading-relaxed">
                     1. El cliente escanea el volante y llena sus datos.<br>
                     2. Se registra de inmediato en tu <strong>Lead</strong> y en tu <strong>Calendario</strong>.<br>
-                    3. Se envía confirmación por email y entra a la Cola de WhatsApp para Baileys.
+                    3. Se envía confirmación por correo y WhatsApp al cliente.
                   </p>
                 </div>
 
@@ -1182,8 +1255,8 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
             <i class="fa-brands fa-whatsapp text-lg"></i>
           </div>
           <div>
-            <h3 class="text-xs font-bold text-[#1F2937]">Servidor WhatsApp Baileys</h3>
-            <p id="waModalSubtitle" class="text-[10px] text-gray-400">Node.js Engine • Línea Oficial</p>
+            <h3 class="text-xs font-bold text-[#1F2937]">Conexión WhatsApp</h3>
+            <p id="waModalSubtitle" class="text-[10px] text-gray-400">Línea de Atención al Cliente</p>
           </div>
         </div>
         <button onclick="closeWhatsAppStatusModal()" class="text-gray-400 hover:text-black w-6 h-6 flex items-center justify-center rounded-lg hover:bg-gray-100">
@@ -1198,11 +1271,11 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
             <span id="waModalDot" class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
           </span>
           <div>
-            <span class="text-xs font-bold text-[#1F2937] block">+1 (551) 232-1994</span>
+            <span id="waModalPhone" class="text-xs font-bold text-[#1F2937] block">Sin número vinculado</span>
             <span id="waModalStateText" class="text-[10px] font-bold text-amber-700">En espera de enlace QR</span>
           </div>
         </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-amber-200 text-amber-800">Baileys</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white border border-amber-200 text-amber-800">WhatsApp Web</span>
       </div>
 
       <!-- Contenedor para escanear QR -->
@@ -1211,7 +1284,8 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         <p class="text-[10px] text-[#59595B] leading-tight">Abre WhatsApp en tu teléfono > Dispositivos vinculados > Vincular un dispositivo.</p>
         <div class="flex justify-center py-2">
           <div id="baileysQrPlaceholder" class="w-36 h-36 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-1.5 shadow-xs">
-            <img id="baileysQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.urenatax.com&color=1F2937" class="w-full h-full object-contain" alt="QR Baileys" />
+            <span id="baileysQrLoading" class="text-[10px] text-gray-400 font-medium px-2">Cargando código QR...</span>
+            <img id="baileysQrImg" src="" class="hidden w-full h-full object-contain" alt="QR Baileys" />
           </div>
         </div>
         <button onclick="checkBaileysServerStatus()" class="py-1 px-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg text-[10px] font-bold text-[#59595B]">
@@ -1226,7 +1300,7 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         </button>
 
         <button id="waToggleConnectBtn" onclick="toggleWhatsAppConnection()" class="w-full py-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-[#59595B] hover:text-red-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
-          <i class="fa-solid fa-power-off text-xs"></i> Reiniciar Sesión Baileys
+          <i class="fa-solid fa-power-off text-xs"></i> Reiniciar Sesión WhatsApp
         </button>
       </div>
     </div>
@@ -1357,7 +1431,7 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
       const titles = {
         'leads': 'Lead',
         'calendar': 'Calendario',
-        'queue': 'Cola de Mensajes Activa (WhatsApp & Baileys / Email Queue)',
+        'queue': 'Historial y Cola de Mensajes',
         'whatsapp': 'Whatsapp',
         'broadcast': 'Email',
         'courses': 'Cursos & Ofertas',
@@ -2069,7 +2143,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
         modalBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between";
         modalPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75";
         modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-[#28D070]";
-        modalStateText.textContent = "Servicio Baileys en espera de enlace QR";
+        modalStateText.textContent = "En espera de enlace QR";
         modalStateText.className = "text-[10px] font-bold text-[#28D070]";
         modalIconBg.className = "w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold";
 
@@ -2498,9 +2572,13 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     checkAuth();
   
     // =========================================================================
-    // COLA DE MENSAJES UNIFICADA (WHATSAPP BAILEYS & EMAIL QUEUE)
+    // COLA DE MENSAJES UNIFICADA & LOG COMPLETO (PAGINACIÓN, EDICIÓN, FALLIDOS)
     // =========================================================================
     let queueFilterCurrent = "all";
+    let queueStatusFilterCurrent = "all";
+    let queueSearchTerm = "";
+    let queueCurrentPage = 1;
+    let queuePageSize = 10;
 
     function getUnifiedQueue() {
       const defaultQueue = [
@@ -2533,6 +2611,17 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
           message: "Hola Maria! Le recordamos su cita para el trámite de ITIN sin retener su pasaporte mañana a las 11:00 AM.",
           status: "Enviado",
           created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString()
+        },
+        {
+          id: "q-4",
+          channel: "email",
+          recipient: "Luis Ramírez",
+          contact: "luis.correo-invalido",
+          subject: "Confirmación de Consulta Web",
+          message: "Hola Luis, recibimos tu consulta sobre apertura de LLC.",
+          status: "Fallido",
+          errorReason: "Correo electrónico inválido o rechazado por servidor SMTP",
+          created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString()
         }
       ];
 
@@ -2549,62 +2638,161 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
       renderUnifiedQueue();
     }
 
+    function enqueueLogItem(item) {
+      const q = getUnifiedQueue();
+      q.unshift({
+        id: "q-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
+        created_at: new Date().toISOString(),
+        status: "Pendiente",
+        ...item
+      });
+      saveUnifiedQueue(q);
+    }
+
+    function escapeHtmlSafe(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function updateQueueFilterStyles() {
+      const statuses = ["all", "Pendiente", "Enviado", "Fallido"];
+      statuses.forEach(st => {
+        const card = document.getElementById("qCard-" + st);
+        const pill = document.getElementById("qPill-" + st);
+        const active = queueStatusFilterCurrent === st;
+        if (card) {
+          card.classList.remove("border-2", "border-[#28D070]", "border-amber-500", "border-emerald-500", "border-red-500");
+          if (active) {
+            const colorClass = st === "Fallido" ? "border-red-500" : st === "Pendiente" ? "border-amber-500" : st === "Enviado" ? "border-emerald-500" : "border-[#28D070]";
+            card.classList.add("border-2", colorClass);
+          }
+        }
+        if (pill) {
+          if (active) {
+            pill.className = st === "Fallido"
+              ? "px-2.5 py-1 text-[11px] font-bold rounded-full bg-red-600 text-white"
+              : st === "Pendiente"
+              ? "px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-500 text-black"
+              : st === "Enviado"
+              ? "px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-600 text-white"
+              : "px-2.5 py-1 text-[11px] font-bold rounded-full bg-gray-900 text-white";
+          } else {
+            pill.className = "px-2.5 py-1 text-[11px] font-bold rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-100";
+          }
+        }
+      });
+
+      ["all", "whatsapp", "email"].forEach(ch => {
+        const btn = document.getElementById("qChan-" + ch);
+        if (btn) {
+          btn.className = queueFilterCurrent === ch
+            ? "px-2.5 py-1 text-[11px] font-bold rounded-md bg-[#28D070] text-black transition-colors"
+            : "px-2.5 py-1 text-[11px] font-bold rounded-md text-[#59595B] hover:text-black transition-colors";
+        }
+      });
+    }
+
     function renderUnifiedQueue() {
       const q = getUnifiedQueue();
       const tbody = document.getElementById("unifiedQueueTbody");
       if (!tbody) return;
 
-      const filtered = q.filter(item => {
-        if (queueFilterCurrent === "all") return true;
-        return item.channel === queueFilterCurrent;
-      });
-
       const totalPending = q.filter(i => i.status === "Pendiente").length;
       const waPending = q.filter(i => i.channel === "whatsapp" && i.status === "Pendiente").length;
       const emPending = q.filter(i => i.channel === "email" && i.status === "Pendiente").length;
       const sentCount = q.filter(i => i.status === "Enviado").length;
+      const failedCount = q.filter(i => i.status === "Fallido").length;
 
       document.getElementById("qStatTotal").textContent = q.length;
-      document.getElementById("qStatWa").textContent = waPending;
-      document.getElementById("qStatEmail").textContent = emPending;
+      document.getElementById("qStatPending").textContent = totalPending;
+      document.getElementById("qStatPendingBreak").textContent = `${waPending} WA • ${emPending} Email`;
       document.getElementById("qStatSent").textContent = sentCount;
+      document.getElementById("qStatFailed").textContent = failedCount;
       document.getElementById("qTableBadge").textContent = `${totalPending} en espera`;
       document.getElementById("queueBadgeCount").textContent = `${totalPending} Cola`;
 
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 font-medium">No hay mensajes en esta vista de la cola.</td></tr>`;
+      updateQueueFilterStyles();
+
+      const term = queueSearchTerm.trim().toLowerCase();
+      const filtered = q.filter(item => {
+        if (queueFilterCurrent !== "all" && item.channel !== queueFilterCurrent) return false;
+        if (queueStatusFilterCurrent !== "all" && item.status !== queueStatusFilterCurrent) return false;
+        if (term) {
+          const hay = `${item.recipient} ${item.contact} ${item.subject} ${item.message} ${item.errorReason || ""}`.toLowerCase();
+          if (!hay.includes(term)) return false;
+        }
+        return true;
+      });
+
+      const totalItems = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / queuePageSize));
+      if (queueCurrentPage > totalPages) queueCurrentPage = totalPages;
+      if (queueCurrentPage < 1) queueCurrentPage = 1;
+
+      const startIdx = (queueCurrentPage - 1) * queuePageSize;
+      const pageItems = filtered.slice(startIdx, startIdx + queuePageSize);
+
+      document.getElementById("queuePaginationInfo").textContent = totalItems === 0
+        ? "Mostrando 0 de 0 registros"
+        : `Mostrando ${startIdx + 1}–${Math.min(startIdx + queuePageSize, totalItems)} de ${totalItems} registros`;
+      document.getElementById("qPageIndicator").textContent = `Página ${queueCurrentPage} de ${totalPages}`;
+      document.getElementById("qPrevBtn").disabled = queueCurrentPage <= 1;
+      document.getElementById("qNextBtn").disabled = queueCurrentPage >= totalPages;
+
+      if (pageItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 font-medium">No hay registros que coincidan con este filtro.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = filtered.map(item => {
+      tbody.innerHTML = pageItems.map(item => {
         const isWa = item.channel === "whatsapp";
         const channelBadge = isWa 
-          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800"><i class="fa-brands fa-whatsapp text-xs"></i> WhatsApp (Baileys)</span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black bg-sky-100 text-sky-800"><i class="fa-solid fa-envelope text-xs"></i> Email (SMTP)</span>`;
+          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800"><i class="fa-brands fa-whatsapp text-xs"></i> WhatsApp</span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black bg-sky-100 text-sky-800"><i class="fa-solid fa-envelope text-xs"></i> Email</span>`;
 
-        const statusBadge = item.status === "Pendiente"
-          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock"></i> Pendiente</span>`
-          : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check-double"></i> Enviado</span>`;
+        let statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock"></i> Pendiente</span>`;
+        if (item.status === "Enviado") {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check-double"></i> Enviado</span>`;
+        } else if (item.status === "Fallido") {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700"><i class="fa-solid fa-triangle-exclamation"></i> Fallido</span>`;
+        }
+
+        const errorHtml = item.status === "Fallido" && item.errorReason
+          ? `<p class="text-[10px] text-red-600 font-bold mt-1 bg-red-50 px-2 py-0.5 rounded border border-red-200 truncate" title="${escapeHtmlSafe(item.errorReason)}"><i class="fa-solid fa-circle-exclamation mr-1"></i>${escapeHtmlSafe(item.errorReason)}</p>`
+          : "";
+
+        const dateObj = new Date(item.created_at);
+        const dateStr = isNaN(dateObj.getTime()) ? "-" : `${dateObj.toLocaleDateString([], {day:"2-digit", month:"short"})} ${dateObj.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}`;
 
         return `
           <tr class="hover:bg-gray-50/80 transition-colors">
-            <td class="py-3 px-4">${channelBadge}</td>
-            <td class="py-3 px-4 font-bold text-[#1F2937]">${item.recipient}</td>
-            <td class="py-3 px-4 font-mono text-[11px] text-[#59595B]">${item.contact}</td>
+            <td class="py-3 px-4 whitespace-nowrap">${channelBadge}</td>
+            <td class="py-3 px-4 font-bold text-[#1F2937]">${escapeHtmlSafe(item.recipient)}</td>
+            <td class="py-3 px-4 font-mono text-[11px] text-[#59595B]">${escapeHtmlSafe(item.contact)}</td>
             <td class="py-3 px-4 max-w-xs">
-              <p class="font-bold text-[11px] text-[#1F2937] truncate">${item.subject || "Sin asunto"}</p>
-              <p class="text-[10px] text-[#59595B] truncate">${item.message}</p>
+              <p class="font-bold text-[11px] text-[#1F2937] truncate">${escapeHtmlSafe(item.subject || "Sin asunto")}</p>
+              <p class="text-[10px] text-[#59595B] truncate">${escapeHtmlSafe(item.message)}</p>
+              ${errorHtml}
             </td>
-            <td class="py-3 px-4">${statusBadge}</td>
-            <td class="py-3 px-4 text-[10px] text-gray-400 font-medium">${new Date(item.created_at).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}</td>
-            <td class="py-3 px-4 text-center">
-              ${item.status === "Pendiente" ? `
-                <button onclick="dispatchSingleQueueItem('${item.id}')" class="px-2.5 py-1 bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold text-[10px] rounded-lg shadow-xs transition-colors">
-                  <i class="fa-solid fa-paper-plane"></i> Enviar
+            <td class="py-3 px-4 whitespace-nowrap">${statusBadge}</td>
+            <td class="py-3 px-4 text-[10px] text-gray-500 font-medium whitespace-nowrap">${dateStr}</td>
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              <div class="inline-flex items-center gap-1">
+                <button type="button" onclick="openEditQueueModal('${item.id}')" title="Editar" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-gray-100 text-gray-700 text-[11px]">
+                  <i class="fa-solid fa-pen-to-square"></i>
                 </button>
-              ` : `
-                <span class="text-gray-300 text-[10px] font-bold">Completado</span>
-              `}
+                ${item.status !== "Enviado" ? `
+                  <button type="button" onclick="dispatchSingleQueueItem('${item.id}')" title="${item.status === "Fallido" ? "Reintentar" : "Enviar ahora"}" class="px-2.5 py-1.5 bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold text-[10px] rounded-lg shadow-xs transition-colors">
+                    <i class="fa-solid ${item.status === "Fallido" ? "fa-rotate-right" : "fa-paper-plane"}"></i> ${item.status === "Fallido" ? "Reintentar" : "Enviar"}
+                  </button>
+                ` : ""}
+                <button type="button" onclick="deleteQueueItem('${item.id}')" title="Eliminar" class="p-1.5 rounded-lg border border-gray-200 bg-white hover:bg-red-50 text-red-500 text-[11px]">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
             </td>
           </tr>
         `;
@@ -2613,34 +2801,166 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
 
     function filterQueue(channel) {
       queueFilterCurrent = channel;
+      queueCurrentPage = 1;
       renderUnifiedQueue();
     }
 
-    function dispatchSingleQueueItem(id) {
+    function filterQueueStatus(status) {
+      queueStatusFilterCurrent = status;
+      queueCurrentPage = 1;
+      renderUnifiedQueue();
+    }
+
+    function onQueueSearch(val) {
+      queueSearchTerm = val || "";
+      queueCurrentPage = 1;
+      renderUnifiedQueue();
+    }
+
+    function changeQueuePageSize(val) {
+      queuePageSize = parseInt(val, 10) || 10;
+      queueCurrentPage = 1;
+      renderUnifiedQueue();
+    }
+
+    function changeQueuePage(delta) {
+      queueCurrentPage += delta;
+      renderUnifiedQueue();
+    }
+
+    function openEditQueueModal(id) {
       const q = getUnifiedQueue();
       const item = q.find(i => i.id === id);
-      if (item) {
-        item.status = "Enviado";
-        saveUnifiedQueue(q);
-        alert(`Mensaje despachado con éxito a ${item.recipient} vía ${item.channel.toUpperCase()}.`);
+      if (!item) return;
+      document.getElementById("editQId").value = item.id;
+      document.getElementById("editQChannel").value = item.channel || "email";
+      document.getElementById("editQStatus").value = item.status || "Pendiente";
+      document.getElementById("editQRecipient").value = item.recipient || "";
+      document.getElementById("editQContact").value = item.contact || "";
+      document.getElementById("editQSubject").value = item.subject || "";
+      document.getElementById("editQMessage").value = item.message || "";
+      const errBox = document.getElementById("editQErrorBox");
+      if (item.errorReason) {
+        errBox.textContent = "Último error: " + item.errorReason;
+        errBox.classList.remove("hidden");
+      } else {
+        errBox.classList.add("hidden");
+      }
+      document.getElementById("editQueueModal").classList.remove("hidden");
+    }
+
+    function closeEditQueueModal() {
+      document.getElementById("editQueueModal").classList.add("hidden");
+    }
+
+    async function saveEditQueueModal(andSend) {
+      const id = document.getElementById("editQId").value;
+      const q = getUnifiedQueue();
+      const item = q.find(i => i.id === id);
+      if (!item) return;
+
+      item.channel = document.getElementById("editQChannel").value;
+      item.status = document.getElementById("editQStatus").value;
+      item.recipient = document.getElementById("editQRecipient").value.trim();
+      item.contact = document.getElementById("editQContact").value.trim();
+      item.subject = document.getElementById("editQSubject").value.trim();
+      item.message = document.getElementById("editQMessage").value.trim();
+      if (item.status !== "Fallido") delete item.errorReason;
+
+      saveUnifiedQueue(q);
+      closeEditQueueModal();
+
+      if (andSend) {
+        await dispatchSingleQueueItem(id);
       }
     }
 
-    function processQueueAll() {
-      const q = getUnifiedQueue();
-      let sentCount = 0;
-      q.forEach(item => {
-        if (item.status === "Pendiente") {
-          item.status = "Enviado";
-          sentCount++;
+    function deleteQueueItem(id) {
+      if (!confirm("¿Eliminar este registro del log?")) return;
+      const q = getUnifiedQueue().filter(i => i.id !== id);
+      saveUnifiedQueue(q);
+    }
+
+    async function sendQueueItemReal(item) {
+      if (item.channel === "email") {
+        if (!item.contact || !item.contact.includes("@")) {
+          throw new Error("Correo inválido: " + (item.contact || "vacío"));
         }
-      });
-      if (sentCount > 0) {
-        saveUnifiedQueue(q);
-        alert(`Se han despachado ${sentCount} mensajes pendientes de la cola (WhatsApp Baileys & Email).`);
+        const res = await fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            formType: "custom",
+            name: item.recipient,
+            email: item.contact,
+            subject: item.subject,
+            message: item.message
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Error HTTP " + res.status);
+        return true;
       } else {
-        alert("No hay mensajes pendientes por despachar en la cola.");
+        const baileysUrl = localStorage.getItem("baileys_service_url") || "http://localhost:3001";
+        const cleanPhone = (item.contact || "").replace(/\D/g, "");
+        if (cleanPhone.length < 7) {
+          throw new Error("Número WhatsApp inválido: " + (item.contact || "vacío"));
+        }
+        const res = await fetch(`${baileysUrl}/send-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: cleanPhone, message: item.message }),
+          signal: AbortSignal.timeout(8000)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Baileys HTTP " + res.status);
+        return true;
       }
+    }
+
+    async function dispatchSingleQueueItem(id) {
+      const q = getUnifiedQueue();
+      const item = q.find(i => i.id === id);
+      if (!item) return;
+
+      try {
+        await sendQueueItemReal(item);
+        item.status = "Enviado";
+        delete item.errorReason;
+        item.sent_at = new Date().toISOString();
+        saveUnifiedQueue(q);
+      } catch (err) {
+        item.status = "Fallido";
+        item.errorReason = err.message || "Error de conexión";
+        saveUnifiedQueue(q);
+        alert(`No se pudo enviar a ${item.recipient}: ${item.errorReason}`);
+      }
+    }
+
+    async function processQueueAll() {
+      const q = getUnifiedQueue();
+      const pendingItems = q.filter(i => i.status === "Pendiente");
+      if (pendingItems.length === 0) {
+        alert("No hay mensajes pendientes por despachar en la cola.");
+        return;
+      }
+      let okCount = 0;
+      let failCount = 0;
+      for (const item of pendingItems) {
+        try {
+          await sendQueueItemReal(item);
+          item.status = "Enviado";
+          delete item.errorReason;
+          item.sent_at = new Date().toISOString();
+          okCount++;
+        } catch (err) {
+          item.status = "Fallido";
+          item.errorReason = err.message || "Error de envío";
+          failCount++;
+        }
+      }
+      saveUnifiedQueue(q);
+      alert(`Despacho finalizado: ${okCount} enviados, ${failCount} fallidos.`);
     }
 
     // Inicializar la cola unificada al cargar la página
@@ -2660,13 +2980,20 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
           const data = await res.json();
           if (data.status === "open") {
             document.getElementById("waStatusLabel").textContent = "Conectado";
+            const waNumEl = document.getElementById("waHeaderNumber");
+            if (waNumEl && (data.phone || data.number)) waNumEl.textContent = data.phone || data.number;
             document.getElementById("waStatusLabel").className = "text-[9px] font-bold text-emerald-600 uppercase tracking-wider";
             document.getElementById("waStatusIcon").className = "fa-brands fa-whatsapp text-base text-emerald-600";
+            const waModalNum = document.getElementById("waModalPhone");
+            if (waModalNum && (data.phone || data.number)) waModalNum.textContent = "+" + String(data.phone || data.number).replace(/^\+/, "");
             document.getElementById("waModalStateText").textContent = "Línea Vinculada y Activa";
             document.getElementById("waModalStateText").className = "text-[10px] font-bold text-emerald-700";
             document.getElementById("baileysQrContainer").classList.add("hidden");
           } else if (data.qr) {
-            document.getElementById("baileysQrImg").src = data.qr;
+            const qrImg = document.getElementById("baileysQrImg");
+            const qrLoad = document.getElementById("baileysQrLoading");
+            if (qrImg) { qrImg.src = data.qr; qrImg.classList.remove("hidden"); }
+            if (qrLoad) qrLoad.classList.add("hidden");
             document.getElementById("baileysQrContainer").classList.remove("hidden");
           }
         }
