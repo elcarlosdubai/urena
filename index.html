@@ -178,13 +178,17 @@
   }
   </script>
   <!-- Supabase Client SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     window.SUPABASE_URL = "https://iqnigpsrmfiiydxyietl.supabase.co";
     window.SUPABASE_ANON = "sb_publishable_bQ8QtLiqktNlmpfBUzyDXg_gjn5JY2h";
     window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
   </script>
 
+  <!-- Google Fonts Outfit Optimizado -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -422,7 +426,7 @@
   </style>
 
   <!-- ==================== POPUP MODAL POSTCARD EN PORTADA (EXACTO A CITA - DIVIDIDO EN 2) ==================== -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
   
   <div id="promoOverlay" class="postcard-modal-overlay">
     <div class="postcard-modal-container">
@@ -482,7 +486,7 @@
           <div class="postcard-side-white">
             <div class="postcard-white-top">
               <div>
-                <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="postcard-white-logo" />
+                <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="postcard-white-logo" width="180" height="76" />
                 <p class="postcard-white-tagline">Accounting • Business Tax • ITIN Specialist</p>
               </div>
               <span class="postcard-pill-exclusive">
