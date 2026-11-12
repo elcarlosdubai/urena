@@ -845,7 +845,6 @@
       var overlay = document.getElementById("promoOverlay");
       var closeBtn = document.getElementById("promoClose");
 
-      // Modal desactivado al inicio para garantizar CLS = 0.00
       window.openPromoModal = function() {
         if (overlay) {
           overlay.style.display = "flex";
@@ -858,7 +857,10 @@
           e.preventDefault();
           e.stopPropagation();
         }
-        if (overlay) { overlay.classList.remove("active"); overlay.style.display = "none"; }
+        if (overlay) {
+          overlay.classList.remove("active");
+          overlay.style.display = "none";
+        }
       };
 
       if (closeBtn) {
@@ -869,6 +871,21 @@
           if (e.target === overlay) closePromoModal(e);
         });
       }
+
+      // Mostrar pop-up automáticamente tras cargar la página
+      setTimeout(function() {
+        // Solo abrir si no ha sido cerrado previamente en la sesión
+        if (!sessionStorage.getItem("promo_closed")) {
+          window.openPromoModal();
+        }
+      }, 1000);
+
+      // Guardar cuando el usuario cierra para no ser invasivo
+      var originalClose = window.closePromoModal;
+      window.closePromoModal = function(e) {
+        try { sessionStorage.setItem("promo_closed", "true"); } catch(err) {}
+        originalClose(e);
+      };
     })();
   </script>
 
