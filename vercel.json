@@ -19,43 +19,15 @@
       "destination": "/cita/index.html"
     },
     {
-      "source": "/contact",
-      "destination": "/index.html"
+      "source": "/admin",
+      "destination": "/admin/index.html"
     },
     {
-      "source": "/contact/(.*)",
-      "destination": "/index.html"
+      "source": "/admin/(.*)",
+      "destination": "/admin/index.html"
     },
     {
-      "source": "/contacto",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/contacto/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/servicios/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/services/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/itin",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/itin/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/about",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/aboutus",
+      "source": "/((?!api|assets|cita|admin|favicon.svg|robots.txt|sitemap.xml).*)",
       "destination": "/index.html"
     }
   ],

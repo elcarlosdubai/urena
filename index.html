@@ -845,10 +845,13 @@
       var overlay = document.getElementById("promoOverlay");
       var closeBtn = document.getElementById("promoClose");
 
-      // Mostrar modal a los 600ms
-      setTimeout(function() {
-        if (overlay) overlay.classList.add("active");
-      }, 600);
+      // Modal desactivado al inicio para garantizar CLS = 0.00
+      window.openPromoModal = function() {
+        if (overlay) {
+          overlay.style.display = "flex";
+          overlay.classList.add("active");
+        }
+      };
 
       window.closePromoModal = function(e) {
         if (e) {
@@ -925,22 +928,23 @@
 
   <style>
     .course-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 21, 40, 0.78);
-      backdrop-filter: blur(8px);
-      z-index: 99999;
-      display: flex;
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(11, 21, 40, 0.78) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      z-index: 99999 !important;
+      display: none !important;
+      pointer-events: none !important;
       align-items: center;
       justify-content: center;
       padding: 16px;
       opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
     }
     .course-modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
+      display: flex !important;
+      pointer-events: auto !important;
+      opacity: 1 !important;
     }
     .course-modal-container {
       background: #FFFFFF;
