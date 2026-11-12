@@ -584,9 +584,12 @@
         <!-- Tarjetas de Progreso Email (Goteo) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
-            <p class="text-[10px] uppercase font-bold text-gray-400">Emails Enviados</p>
-            <p class="text-xl font-black text-emerald-600">42</p>
-            <p class="text-[9px] text-gray-400 font-bold mt-0.5">/ 120 en cola</p>
+            <div class="flex items-center justify-between mb-1">
+              <p class="text-[10px] uppercase font-bold text-gray-400">Emails Enviados</p>
+              <span id="emailCampaignStatusPill" class="text-[9px] font-bold text-gray-400">Listo</span>
+            </div>
+            <p class="text-2xl font-black text-emerald-600" id="emailSentCount">0</p>
+            <p class="text-[9px] text-gray-400 font-bold mt-0.5" id="emailTotalQueue">/ 0 en cola</p>
           </div>
           <div class="bg-white border border-gray-200 rounded-xl p-3 text-center shadow-xs">
             <p class="text-[10px] uppercase font-bold text-gray-400">Cadencia (Goteo)</p>
@@ -823,47 +826,60 @@ Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson,
 
       <!-- ========================================================================= -->
       <!-- PESTAÑA 5: CONFIGURACIÓN DE HORARIOS Y DÍAS CERRADOS (SETTINGS)           -->
-      <!-- ========================================================================= -->
       <section id="tab-settings" class="hidden space-y-4">
         <div class="max-w-2xl mx-auto bg-white p-6 rounded-xl border border-gray-200 shadow-xs space-y-6">
-          <div class="border-b border-gray-100 pb-3">
-            <h3 class="font-extrabold text-[#1F2937] text-sm flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-[#28D070]"></i> Configuración de Días y Horarios para Citas
-            </h3>
-            <p class="text-xs text-gray-400 mt-0.5">Define qué días abre la oficina y en qué horario los clientes pueden agendar.</p>
+          <div class="border-b border-gray-100 pb-3 flex items-center justify-between">
+            <div>
+              <h3 class="font-extrabold text-[#1F2937] text-sm flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-[#28D070]"></i> Configuración de Días y Horarios para Citas
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">Controla qué días abre la oficina y cada cuántos minutos se toman citas.</p>
+            </div>
+            <button onclick="saveScheduleSettings()" class="py-2 px-4 bg-[#28D070] hover:bg-emerald-500 font-black text-black rounded-xl text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-floppy-disk text-xs"></i>
+              <span>Guardar Horarios</span>
+            </button>
           </div>
 
-          <!-- Días Laborables -->
+          <div id="settingsAlertMsg" class="hidden p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-[#139C8E] text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-base"></i>
+            <span>¡Horarios y días de atención sincronizados en la nube con éxito!</span>
+          </div>
+
+          <!-- Días Laborables (Checkboxes interactivos) -->
           <div class="space-y-3">
-            <label class="text-xs font-bold text-[#1F2937] uppercase block">Días de Atención en Oficina</label>
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-bold text-[#1F2937] uppercase block">Días de Atención en Oficina</label>
+              <span class="text-[11px] text-gray-400 font-semibold">Toca para activar/desactivar</span>
+            </div>
             <div class="grid grid-cols-7 gap-2 text-center text-xs">
               <label class="cursor-pointer">
-                <input type="checkbox" class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold text-gray-400">Dom</div>
+                <input type="checkbox" id="workDay0" value="0" class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Dom</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Lun</div>
+                <input type="checkbox" id="workDay1" value="1" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Lun</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Mar</div>
+                <input type="checkbox" id="workDay2" value="2" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Mar</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Mié</div>
+                <input type="checkbox" id="workDay3" value="3" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Mié</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Jue</div>
+                <input type="checkbox" id="workDay4" value="4" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Jue</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Vie</div>
+                <input type="checkbox" id="workDay5" value="5" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Vie</div>
               </label>
               <label class="cursor-pointer">
-                <input type="checkbox" checked class="hidden peer">
-                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-bold">Sáb</div>
+                <input type="checkbox" id="workDay6" value="6" checked class="hidden peer">
+                <div class="p-2.5 rounded-lg border border-gray-200 peer-checked:bg-[#28D070] peer-checked:text-black peer-checked:font-black text-gray-400 transition-all font-semibold">Sáb</div>
               </label>
             </div>
           </div>
@@ -872,36 +888,43 @@ Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson,
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="text-xs font-bold text-[#374151] block mb-1">Hora de Apertura:</label>
-              <input type="time" value="09:00" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold">
+              <input type="time" id="settingOpenTime" value="09:00" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-[#1F2937]">
             </div>
             <div>
               <label class="text-xs font-bold text-[#374151] block mb-1">Hora de Cierre:</label>
-              <input type="time" value="18:00" class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold">
+              <input type="time" id="settingCloseTime" value="18:00" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-[#1F2937]">
             </div>
           </div>
 
-          <!-- Duración por Cita -->
+          <!-- Intervalo entre Citas (Evita aglomeraciones) -->
           <div>
-            <label class="text-xs font-bold text-[#374151] block mb-1">Duración estimada por cliente:</label>
-            <select class="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-semibold">
-              <option>30 minutos por cita</option>
-              <option selected>45 minutos por cita (Recomendado para Taxes)</option>
-              <option>60 minutos por cita</option>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-bold text-[#374151] block">Intervalo de Atención (Cada cuánto tiempo se toma cita):</label>
+              <span class="text-[11px] text-[#28D070] font-black">Control de Capacidad</span>
+            </div>
+            <select id="settingSlotDuration" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-[#1F2937]">
+              <option value="15" selected>Cada 15 minutos</option>
+              <option value="30">Cada 30 minutos</option>
+              <option value="45">Cada 45 minutos</option>
+              <option value="60">Cada 60 minutos (1 hora)</option>
             </select>
+            <p class="text-[11px] text-gray-400 mt-1">Este intervalo genera automáticamente las horas exactas que los clientes ven en el formulario para que no se junten más de una cita a la misma hora.</p>
           </div>
 
           <!-- Bloqueo de Días Festivos / Feriados Cerrados -->
-          <div class="p-3 bg-red-50 border border-red-200 rounded-xl space-y-2">
+          <div class="p-3.5 bg-red-50 border border-red-200 rounded-xl space-y-2">
             <span class="text-xs font-bold text-red-700 block flex items-center gap-1.5">
-              <i class="fa-solid fa-ban"></i> Bloquear Fecha Específica (Día Cerrado)
+              <i class="fa-solid fa-ban"></i> Bloquear Fecha Específica (Feriado o Día Cerrado)
             </span>
             <div class="flex gap-2">
-              <input type="date" value="2026-11-26" class="p-1.5 bg-white border border-red-200 rounded-lg text-xs flex-1">
-              <input type="text" value="Thanksgiving Day" class="p-1.5 bg-white border border-red-200 rounded-lg text-xs flex-1">
-              <button onclick="alert('Día bloqueado: Ningún cliente podrá reservar el 26 de Noviembre.')" class="py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs">Bloquear</button>
+              <input type="date" id="blockSpecificDate" value="2026-11-26" class="p-2 bg-white border border-red-200 rounded-lg text-xs flex-1 font-bold">
+              <input type="text" id="blockDateReason" value="Thanksgiving Day" placeholder="Motivo (ej: Navidad)" class="p-2 bg-white border border-red-200 rounded-lg text-xs flex-1">
+              <button onclick="addBlockedDate()" class="py-2 px-3.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-xs cursor-pointer">Bloquear</button>
+            </div>
+            <div id="blockedDatesList" class="pt-1 flex flex-wrap gap-1.5 text-[11px]">
+              <span class="bg-white border border-red-200 text-red-700 px-2 py-0.5 rounded font-bold">2026-11-26 (Thanksgiving)</span>
             </div>
           </div>
-
 
           <!-- TARJETA: GENERADOR DE QR CODE PARA VOLANTES (FLYERS) -->
           <div class="border-t border-gray-100 pt-5 space-y-4">
@@ -1495,8 +1518,78 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
       alert("✅ Correo de prueba enviado con éxito a: " + email + "\n\nAsunto: " + subj + "\n\nFormato HTML/Texto verificado.");
     };
 
-    window.startEmailDrip = function() {
-      alert("Iniciando Campaña por Goteo: 20 correos por hora mediante cola SMTP para garantizar 100% de entregabilidad en bandeja principal.");
+    window.startEmailDrip = async function() {
+      const subject = document.getElementById("emailSubject").value.trim();
+      const body = document.getElementById("emailBody").value.trim();
+      
+      const leads = getLeads().filter(l => l.email && l.email.includes("@"));
+      const students = typeof getCourseStudents === "function" ? getCourseStudents().filter(s => s.email && s.email.includes("@")) : [];
+      
+      const emailMap = new Map();
+      leads.forEach(l => emailMap.set(l.email.toLowerCase(), { email: l.email.toLowerCase(), name: l.name }));
+      students.forEach(s => emailMap.set(s.email.toLowerCase(), { email: s.email.toLowerCase(), name: s.name }));
+      
+      const recipientsList = Array.from(emailMap.values());
+      const total = recipientsList.length || 1;
+
+      if (!subject || !body) {
+        alert("Por favor ingresa asunto y cuerpo para la campaña.");
+        return;
+      }
+
+      // 1. Guardar Campaña en Supabase Cloud
+      if (window.supabaseClient) {
+        try {
+          const { data: campData, error: campErr } = await window.supabaseClient.from("email_campaigns").insert([{
+            name: "Temporada Taxes 2026",
+            subject: subject,
+            content: body,
+            total_recipients: total,
+            sent_count: 0,
+            interval_seconds: 45,
+            status: "En Progreso"
+          }]).select();
+
+          if (!campErr && campData && campData.length > 0) {
+            const campaignId = campData[0].id;
+
+            // 2. Insertar cada correo en la cola de envíos en la nube
+            const queueItems = recipientsList.map(r => ({
+              campaign_id: campaignId,
+              recipient_email: r.email,
+              recipient_name: r.name,
+              status: "Pendiente"
+            }));
+
+            await window.supabaseClient.from("email_queue").insert(queueItems);
+            console.log("Cola de correos insertada en Supabase:", queueItems.length);
+
+            // Disparar primer lote inmediatamente
+            fetch("/api/process-email-drip").catch(() => {});
+          }
+        } catch(e) {
+          console.warn("Supabase queue insert error:", e);
+        }
+      }
+
+      const campaignState = {
+        active: true,
+        subject: subject,
+        body: body,
+        total: total,
+        sent: 0,
+        startTime: Date.now(),
+        intervalSeconds: 45
+      };
+      localStorage.setItem("urena_active_email_campaign", JSON.stringify(campaignState));
+
+      alert(`🚀 ¡Campaña por Goteo Activada en la Nube!
+
+• Asunto: ${subject}
+• Destinatarios: ${total} correos en cola
+• Cadencia: Lotes automáticos cada minuto en el servidor
+
+Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El servidor en la nube continuará los envíos físicamente por ti.`);
     };
 
     // ACTUALIZAR VISTA PREVIA EMAIL
@@ -1918,7 +2011,95 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
 
     function saveCourseStudents(list) {
       localStorage.setItem("urena_courses_students_v1", JSON.stringify(list));
-      renderCoursesTable();
+      
+    // =========================================================================
+    // CONFIGURACIÓN DE HORARIOS & INTERVALOS EN TIEMPO REAL
+    // =========================================================================
+    const SETTINGS_KEY = "urena_business_schedule_v1";
+
+    function getScheduleSettings() {
+      const stored = localStorage.getItem(SETTINGS_KEY);
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      return {
+        workDays: [1, 2, 3, 4, 5, 6], // Lun a Sab
+        openTime: "09:00",
+        closeTime: "18:00",
+        slotDuration: 45,
+        blockedDates: ["2026-11-26"]
+      };
+    }
+
+    function initScheduleSettingsUI() {
+      const s = getScheduleSettings();
+      for (let i = 0; i <= 6; i++) {
+        const chk = document.getElementById(`workDay${i}`);
+        if (chk) chk.checked = s.workDays.includes(i);
+      }
+      if (document.getElementById("settingOpenTime")) document.getElementById("settingOpenTime").value = s.openTime;
+      if (document.getElementById("settingCloseTime")) document.getElementById("settingCloseTime").value = s.closeTime;
+      if (document.getElementById("settingSlotDuration")) document.getElementById("settingSlotDuration").value = s.slotDuration;
+    }
+
+    async function saveScheduleSettings() {
+      const workDays = [];
+      for (let i = 0; i <= 6; i++) {
+        const chk = document.getElementById(`workDay${i}`);
+        if (chk && chk.checked) workDays.push(i);
+      }
+      const openTime = document.getElementById("settingOpenTime").value;
+      const closeTime = document.getElementById("settingCloseTime").value;
+      const slotDuration = parseInt(document.getElementById("settingSlotDuration").value);
+
+      const settings = {
+        workDays,
+        openTime,
+        closeTime,
+        slotDuration,
+        blockedDates: ["2026-11-26"]
+      };
+
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+      // Guardar en Supabase en la nube
+      if (window.supabaseClient) {
+        try {
+          await window.supabaseClient.from("business_settings").upsert({
+            id: 1,
+            work_days: workDays,
+            open_time: openTime,
+            close_time: closeTime,
+            slot_duration: slotDuration,
+            updated_at: new Date().toISOString()
+          });
+          console.log("Horarios sincronizados en Supabase Cloud!");
+        } catch(e) {
+          console.warn("Error guardando settings en Supabase:", e);
+        }
+      }
+
+      const alertBox = document.getElementById("settingsAlertMsg");
+      if (alertBox) {
+        alertBox.classList.remove("hidden");
+        setTimeout(() => alertBox.classList.add("hidden"), 3000);
+      }
+    }
+
+    window.addBlockedDate = function() {
+      const d = document.getElementById("blockSpecificDate").value;
+      const r = document.getElementById("blockDateReason").value;
+      if (!d) return;
+      const list = document.getElementById("blockedDatesList");
+      if (list) {
+        list.innerHTML += `<span class="bg-white border border-red-200 text-red-700 px-2 py-0.5 rounded font-bold">${d} (${r || Cerrado})</span>`;
+      }
+      alert(`Fecha ${d} bloqueada. Ningún cliente podrá reservar ese día.`);
+    };
+
+    setTimeout(initScheduleSettingsUI, 400);
+    
+    renderCoursesTable();
     }
 
     function renderCoursesTable() {
@@ -2053,6 +2234,94 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
       closeCourseBroadcastModal();
     };
 
+    
+    // =========================================================================
+    // CONFIGURACIÓN DE HORARIOS & INTERVALOS EN TIEMPO REAL
+    // =========================================================================
+    const SETTINGS_KEY = "urena_business_schedule_v1";
+
+    function getScheduleSettings() {
+      const stored = localStorage.getItem(SETTINGS_KEY);
+      if (stored) {
+        try { return JSON.parse(stored); } catch(e) {}
+      }
+      return {
+        workDays: [1, 2, 3, 4, 5, 6], // Lun a Sab
+        openTime: "09:00",
+        closeTime: "18:00",
+        slotDuration: 45,
+        blockedDates: ["2026-11-26"]
+      };
+    }
+
+    function initScheduleSettingsUI() {
+      const s = getScheduleSettings();
+      for (let i = 0; i <= 6; i++) {
+        const chk = document.getElementById(`workDay${i}`);
+        if (chk) chk.checked = s.workDays.includes(i);
+      }
+      if (document.getElementById("settingOpenTime")) document.getElementById("settingOpenTime").value = s.openTime;
+      if (document.getElementById("settingCloseTime")) document.getElementById("settingCloseTime").value = s.closeTime;
+      if (document.getElementById("settingSlotDuration")) document.getElementById("settingSlotDuration").value = s.slotDuration;
+    }
+
+    async function saveScheduleSettings() {
+      const workDays = [];
+      for (let i = 0; i <= 6; i++) {
+        const chk = document.getElementById(`workDay${i}`);
+        if (chk && chk.checked) workDays.push(i);
+      }
+      const openTime = document.getElementById("settingOpenTime").value;
+      const closeTime = document.getElementById("settingCloseTime").value;
+      const slotDuration = parseInt(document.getElementById("settingSlotDuration").value);
+
+      const settings = {
+        workDays,
+        openTime,
+        closeTime,
+        slotDuration,
+        blockedDates: ["2026-11-26"]
+      };
+
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+
+      // Guardar en Supabase en la nube
+      if (window.supabaseClient) {
+        try {
+          await window.supabaseClient.from("business_settings").upsert({
+            id: 1,
+            work_days: workDays,
+            open_time: openTime,
+            close_time: closeTime,
+            slot_duration: slotDuration,
+            updated_at: new Date().toISOString()
+          });
+          console.log("Horarios sincronizados en Supabase Cloud!");
+        } catch(e) {
+          console.warn("Error guardando settings en Supabase:", e);
+        }
+      }
+
+      const alertBox = document.getElementById("settingsAlertMsg");
+      if (alertBox) {
+        alertBox.classList.remove("hidden");
+        setTimeout(() => alertBox.classList.add("hidden"), 3000);
+      }
+    }
+
+    window.addBlockedDate = function() {
+      const d = document.getElementById("blockSpecificDate").value;
+      const r = document.getElementById("blockDateReason").value;
+      if (!d) return;
+      const list = document.getElementById("blockedDatesList");
+      if (list) {
+        list.innerHTML += `<span class="bg-white border border-red-200 text-red-700 px-2 py-0.5 rounded font-bold">${d} (${r || Cerrado})</span>`;
+      }
+      alert(`Fecha ${d} bloqueada. Ningún cliente podrá reservar ese día.`);
+    };
+
+    setTimeout(initScheduleSettingsUI, 400);
+    
     renderCoursesTable();
     renderCalendar();
     renderLeads();

@@ -314,6 +314,154 @@
     }
 
     // Poner fecha sugerida mínima (Mañana)
+    // =========================================================================
+    // VALIDACIÓN DINÁMICA DE HORARIOS, DÍAS LABORABLES E INTERVALOS
+    // =========================================================================
+    let currentSchedule = {
+      workDays: [1, 2, 3, 4, 5, 6], // Lun a Sab
+      openTime: "09:00",
+      closeTime: "18:00",
+      slotDuration: 15,
+      blockedDates: ["2026-11-26"]
+    };
+
+    async function loadScheduleConfig() {
+      // 1. Intentar cargar desde Supabase en la nube
+      if (window.supabaseClient) {
+        try {
+          const { data, error } = await window.supabaseClient
+            .from("business_settings")
+            .select("*")
+            .eq("id", 1)
+            .single();
+
+          if (!error && data) {
+            currentSchedule = {
+              workDays: data.work_days || [1,2,3,4,5,6],
+              openTime: data.open_time || "09:00",
+              closeTime: data.close_time || "18:00",
+              slotDuration: data.slot_duration || 15,
+              blockedDates: data.blocked_dates || ["2026-11-26"]
+            };
+          }
+        } catch(e) {
+          console.warn("Cargando settings por defecto:", e);
+        }
+      }
+
+      // 2. Si hay guardado en localStorage
+      const local = localStorage.getItem("urena_business_schedule_v1");
+      if (local) {
+        try { currentSchedule = JSON.parse(local); } catch(e) {}
+      }
+
+      updateAvailableTimeSlots();
+    }
+
+    function formatTime12(h, m) {
+      const ampm = h >= 12 ? "PM" : "AM";
+      const h12 = h % 12 === 0 ? 12 : h % 12;
+      const mStr = String(m).padStart(2, "0");
+      const hStr = String(h12).padStart(2, "0");
+      return `${hStr}:${mStr} ${ampm}`;
+    }
+
+    async function updateAvailableTimeSlots() {
+      const dateInput = document.getElementById("clientDate");
+      const timeSelect = document.getElementById("clientTime");
+      if (!dateInput || !timeSelect) return;
+
+      const selectedDate = dateInput.value;
+      if (!selectedDate) return;
+
+      // Validar si el día de la semana está abierto
+      const parts = selectedDate.split("-");
+      const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const dayOfWeek = dateObj.getDay(); // 0=Dom, 1=Lun, etc.
+      const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+      let dateError = document.getElementById("dateNoticeMsg");
+      const isClosedDay = !currentSchedule.workDays.includes(dayOfWeek);
+      const isBlockedHoliday = (currentSchedule.blockedDates || []).includes(selectedDate);
+
+      if (isClosedDay || isBlockedHoliday) {
+        if (!dateError) {
+          dateError = document.createElement("div");
+          dateError.id = "dateNoticeMsg";
+          dateError.className = "p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold mt-1";
+          dateInput.parentNode.appendChild(dateError);
+        }
+        dateError.classList.remove("hidden");
+        dateError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> La oficina de Ureña Tax está cerrada los días <strong>${dayNames[dayOfWeek]}</strong>. Por favor selecciona otro día hábil.`;
+        
+        timeSelect.innerHTML = `<option value="">-- Oficina Cerrada este día --</option>`;
+        timeSelect.disabled = true;
+        return;
+      } else {
+        if (dateError) dateError.classList.add("hidden");
+        timeSelect.disabled = false;
+      }
+
+      // Consultar citas ya ocupadas para no duplicar horas
+      let occupiedHours = [];
+      try {
+        const localApts = JSON.parse(localStorage.getItem("urena_appointments_v1") || "[]");
+        occupiedHours = localApts.filter(a => a.date === selectedDate).map(a => a.time);
+      } catch(e) {}
+
+      if (window.supabaseClient) {
+        try {
+          const { data: cloudApts } = await window.supabaseClient
+            .from("appointments")
+            .select("appointment_time")
+            .eq("appointment_date", selectedDate);
+
+          if (cloudApts) {
+            cloudApts.forEach(ca => {
+              if (!occupiedHours.includes(ca.appointment_time)) occupiedHours.push(ca.appointment_time);
+            });
+          }
+        } catch(e) {}
+      }
+
+      // Generar horas con el intervalo elegido (15, 30, 45 o 60 min)
+      const [startH, startM] = currentSchedule.openTime.split(":").map(Number);
+      const [endH, endM] = currentSchedule.closeTime.split(":").map(Number);
+      const slot = currentSchedule.slotDuration || 45;
+
+      let currentMinutes = startH * 60 + startM;
+      const endMinutes = endH * 60 + endM;
+
+      timeSelect.innerHTML = "";
+      let availableSlotsCount = 0;
+
+      while (currentMinutes + slot <= endMinutes) {
+        const h = Math.floor(currentMinutes / 60);
+        const m = currentMinutes % 60;
+        const timeFormatted = formatTime12(h, m);
+
+        const isOccupied = occupiedHours.includes(timeFormatted);
+        const opt = document.createElement("option");
+        opt.value = timeFormatted;
+
+        if (isOccupied) {
+          opt.textContent = `${timeFormatted} — (Ocupado)`;
+          opt.disabled = true;
+        } else {
+          opt.textContent = `${timeFormatted} — (Disponible)`;
+          availableSlotsCount++;
+        }
+
+        timeSelect.appendChild(opt);
+        currentMinutes += slot;
+      }
+
+      if (availableSlotsCount === 0) {
+        timeSelect.innerHTML = `<option value="">-- No hay cupos disponibles para esta fecha --</option>`;
+        timeSelect.disabled = true;
+      }
+    }
+
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const yyyy = tomorrow.getFullYear();
@@ -321,6 +469,8 @@
     const dd = String(tomorrow.getDate()).padStart(2, '0');
     document.getElementById("clientDate").value = `${yyyy}-${mm}-${dd}`;
     document.getElementById("clientDate").min = `${yyyy}-${mm}-${dd}`;
+    document.getElementById("clientDate").addEventListener("change", updateAvailableTimeSlots);
+    setTimeout(loadScheduleConfig, 300);
 
     function handleQrBooking(e) {
       e.preventDefault();
@@ -331,6 +481,20 @@
       const service = document.getElementById("clientService").value;
       const date = document.getElementById("clientDate").value;
       const time = document.getElementById("clientTime").value;
+
+      // VALIDACIÓN ESTRICTA: Impedir envío si el día está cerrado o la hora no es válida
+      if (!time || time.includes("Cerrada") || time.includes("No hay cupos")) {
+        alert("La fecha seleccionada no tiene disponibilidad o la oficina está cerrada. Por favor elige otro día.");
+        return;
+      }
+
+      // Validar si la hora ya fue ocupada por otro usuario antes de guardar
+      const timeSelect = document.getElementById("clientTime");
+      const selectedOption = timeSelect.options[timeSelect.selectedIndex];
+      if (selectedOption && selectedOption.disabled) {
+        alert("Ese horario ya fue reservado por otro cliente. Por favor elige otra hora disponible.");
+        return;
+      }
       const notes = document.getElementById("clientNotes").value.trim();
 
       const submitBtn = document.getElementById("submitBtn");
@@ -338,6 +502,22 @@
       submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando Cita...';
 
       setTimeout(() => {
+        // Disparar correos dobles (Confirmación al cliente + Alerta a la oficina)
+        fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            formType: "appointment",
+            name: name,
+            phone: phone,
+            email: email,
+            service: service,
+            date: date,
+            time: time,
+            notes: notes
+          })
+        }).catch(err => console.warn("Email dispatch error:", err));
+
         // GUARDAR EN SUPABASE REALTIME CLOUD
         if (window.supabaseClient) {
           window.supabaseClient.from("leads").insert([{

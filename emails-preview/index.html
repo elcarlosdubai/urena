@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Visor de Emails Corporativos | Ureña Tax</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #F4F5F6;
+      color: #1F2937;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    header {
+      background: #FFFFFF;
+      border-bottom: 2px solid #E5E7EB;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title {
+      font-weight: 900;
+      font-size: 18px;
+      color: #1F2937;
+    }
+    .badge {
+      background: #28D070;
+      color: #000000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #D1D5DB;
+      background: #FFFFFF;
+      color: #4B5563;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #000000;
+      color: #28D070;
+      border-color: #000000;
+    }
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      padding: 20px;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+    .device-frame {
+      width: 100%;
+      max-width: 650px;
+      height: 100%;
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #E5E7EB;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .frame-bar {
+      background: #F9FAFB;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+      height: 100%;
+      background: #F4F5F6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-title">UREÑA TAX & ACCOUNTING</div>
+      <span class="badge">Centro de Previsualización en Vivo</span>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="loadView('confirmacion-cita.html', this)">📅 1. Cita Cliente (Con Progreso 100%)</button>
+      <button class="tab-btn" onclick="loadView('contacto-cliente.html', this)">✉️ 2. Contacto Cliente (Dashboard Progreso)</button>
+      <button class="tab-btn" onclick="loadView('alerta-oficina.html', this)">🔔 3. Alerta Cita Oficina</button>
+      <button class="tab-btn" onclick="loadView('contacto-oficina.html', this)">📩 4. Alerta Contacto Oficina</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="device-frame">
+      <div class="frame-bar">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span style="margin-left: 10px; font-weight: 600;" id="frame-title">emails-preview/confirmacion-cita.html</span>
+      </div>
+      <iframe id="preview-frame" src="confirmacion-cita.html"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function loadView(file, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('preview-frame').src = file;
+      document.getElementById('frame-title').textContent = 'emails-preview/' + file;
+    }
+  </script>
+
+</body>
+</html>
