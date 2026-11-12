@@ -97,24 +97,58 @@ function formatWhatsAppJid(phone) {
 }
 
 // Función de Envío Directo
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const randomBetween = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// Envío humanizado anti-detección de Meta:
+// 1. Nunca envía en paralelo (cola secuencial)
+// 2. Marca presencia "en línea" -> "escribiendo..." proporcional al texto -> "pausa" -> envía
 async function sendWhatsAppMessage(phone, messageText) {
   if (connectionState !== 'open' || !sock) {
-    throw new Error('El bot de WhatsApp no está conectado.');
+    throw new Error('WhatsApp no está conectado.');
   }
   const jid = formatWhatsAppJid(phone);
+
+  try {
+    await sock.sendPresenceUpdate('available', jid);
+    await sleep(randomBetween(800, 1600));
+    await sock.presenceSubscribe(jid).catch(() => {});
+    await sock.sendPresenceUpdate('composing', jid);
+
+    // Simular tiempo de escritura humano según longitud del mensaje (2.5s a 6.5s)
+    const typingMs = Math.min(6500, Math.max(2500, (messageText || '').length * 38));
+    await sleep(typingMs + randomBetween(300, 900));
+
+    await sock.sendPresenceUpdate('paused', jid);
+    await sleep(randomBetween(300, 700));
+  } catch (_) {}
+
   return await sock.sendMessage(jid, { text: messageText });
 }
 
 // =========================================================================
-// MOTOR DE COLA AUTOMÁTICO (PROCESADOR DE MENSAJES DE UREÑA TAX)
+// MOTOR DE COLA AUTOMÁTICO CON PROTECCIÓN ANTI-BANEO (GOTEO HUMANO)
 // =========================================================================
 let isWorkerRunning = false;
+let isProcessingBatch = false; // Lock estricto: jamás envía 2 mensajes a la vez
+let sentInCurrentBlock = 0;
+
+function isSafeBusinessHourNY() {
+  // Evita envíos masivos de madrugada (permite 8:00 AM - 9:00 PM hora New York)
+  const nyHour = Number(new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    hour12: false
+  }).format(new Date()));
+  return nyHour >= 8 && nyHour < 21;
+}
 
 async function processQueueOnce() {
-  if (!supabase || connectionState !== 'open') return;
+  if (!supabase || connectionState !== 'open' || isProcessingBatch) return;
+  if (!isSafeBusinessHourNY()) return;
 
+  isProcessingBatch = true;
   try {
-    // 1. Buscar mensajes pendientes en email_queue o message_queue con canal whatsapp
     const { data: pending, error } = await supabase
       .from('email_queue')
       .select('*')
@@ -124,29 +158,43 @@ async function processQueueOnce() {
     if (error || !pending || pending.length === 0) return;
 
     for (const item of pending) {
-      if (item.phone || item.contact) {
-        const dest = item.phone || item.contact;
-        const msg = item.body || item.message;
-        console.log(`[Baileys Worker] Despachando a ${dest}...`);
+      if (connectionState !== 'open') break;
+      const dest = item.phone || item.contact;
+      const msg = item.body || item.message;
+      if (!dest || !msg) continue;
 
-        try {
-          await sendWhatsAppMessage(dest, msg);
-          await supabase
-            .from('email_queue')
-            .update({ status: 'Enviado', updated_at: new Date().toISOString() })
-            .eq('id', item.id);
-          console.log(`[Baileys Worker] ✅ Enviado a ${dest}`);
-        } catch (err) {
-          console.error(`[Baileys Worker] ❌ Error enviando a ${dest}:`, err.message);
-        }
+      console.log(`[WhatsApp Goteo] Escribiendo a ${dest}...`);
+      try {
+        await sendWhatsAppMessage(dest, msg);
+        await supabase
+          .from('email_queue')
+          .update({ status: 'Enviado', updated_at: new Date().toISOString() })
+          .eq('id', item.id);
+        sentInCurrentBlock++;
+        console.log(`[WhatsApp Goteo] ✅ Enviado a ${dest} (Bloque: ${sentInCurrentBlock}/25)`);
+      } catch (err) {
+        console.error(`[WhatsApp Goteo] ❌ Error a ${dest}:`, err.message);
+        await supabase
+          .from('email_queue')
+          .update({ status: 'Fallido', error_message: err.message, updated_at: new Date().toISOString() })
+          .eq('id', item.id);
+      }
 
-        // Delay anti-ban entre mensajes (30 a 45 segundos)
-        const delay = Math.floor(Math.random() * 15000) + 25000;
-        await new Promise(r => setTimeout(r, delay));
+      // Pausa larga de enfriamiento cada 25 mensajes (4 a 7 minutos)
+      if (sentInCurrentBlock >= 25) {
+        const coolDownMs = randomBetween(240000, 420000);
+        console.log(`[WhatsApp Goteo] ☕ Pausa humana de enfriamiento (${Math.round(coolDownMs / 60000)} min)...`);
+        sentInCurrentBlock = 0;
+        await sleep(coolDownMs);
+      } else {
+        // Espera orgánica entre mensajes (28 a 55 segundos)
+        await sleep(randomBetween(28000, 55000));
       }
     }
   } catch (e) {
-    console.warn('[Baileys Worker Error]:', e.message);
+    console.warn('[WhatsApp Goteo Error]:', e.message);
+  } finally {
+    isProcessingBatch = false;
   }
 }
 

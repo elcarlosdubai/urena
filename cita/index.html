@@ -596,48 +596,80 @@
         const volverBtn = document.querySelector("button[onclick='flipPostcard(false)']");
         if (volverBtn) volverBtn.style.display = "none";
 
-                // 4. ENCOLAR MENSAJE EN LA COLA UNIFICADA (EMAIL & WHATSAPP BAILEYS)
+        // 4. ENVIAR CORREO DE CONFIRMACIÓN AL INSTANTE Y REGISTRAR LOG
         const waText = `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;
         const emailSubject = `Confirmación de Cita (10% Descuento) - Ureña Tax`;
 
-        try {
-          const currentQueue = JSON.parse(localStorage.getItem("urena_unified_message_queue") || "[]");
-          currentQueue.unshift({
-            id: Date.now() + "-wa",
-            channel: "whatsapp",
-            recipient: name,
-            contact: phone,
-            subject: "Confirmación WhatsApp (Baileys)",
-            message: waText,
-            status: "Pendiente",
-            created_at: new Date().toISOString()
-          });
-          currentQueue.unshift({
-            id: Date.now() + "-em",
-            channel: "email",
-            recipient: name,
-            contact: email,
-            subject: emailSubject,
-            message: `Servicio: ${service} | Fecha: ${date} ${time}`,
-            status: "Pendiente",
-            created_at: new Date().toISOString()
-          });
-          localStorage.setItem("urena_unified_message_queue", JSON.stringify(currentQueue));
-        } catch(e) {
-          console.warn("Error guardando cola local:", e);
-        }
-
-        if (window.supabaseClient) {
-          window.supabaseClient.from("email_queue").insert([
-            {
-              email: email,
-              recipient: name,
-              subject: emailSubject,
-              body: `Cita agendada para ${service} el ${date} a las ${time}`,
-              status: "Pendiente"
+        (async () => {
+          let emailStatus = "Enviado";
+          let emailError = null;
+          try {
+            const resp = await fetch("/api/send-email", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                formType: "appointment",
+                name,
+                phone,
+                email,
+                service,
+                date,
+                time,
+                notes
+              })
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+              emailStatus = "Fallido";
+              emailError = data.error || ("Error HTTP " + resp.status);
             }
-          ]).then(r => console.log("Encolado email en Supabase:", r));
-        }
+          } catch (err) {
+            emailStatus = "Fallido";
+            emailError = err.message || "Error de red al enviar correo";
+          }
+
+          try {
+            const currentQueue = JSON.parse(localStorage.getItem("urena_unified_message_queue") || "[]");
+            currentQueue.unshift({
+              id: Date.now() + "-wa",
+              channel: "whatsapp",
+              recipient: name,
+              contact: phone,
+              subject: "Confirmación de Cita",
+              message: waText,
+              status: "Pendiente",
+              created_at: new Date().toISOString()
+            });
+            const emailEntry = {
+              id: Date.now() + "-em",
+              channel: "email",
+              recipient: name,
+              contact: email,
+              subject: emailSubject,
+              message: `Servicio: ${service} | Fecha: ${date} ${time}`,
+              status: emailStatus,
+              created_at: new Date().toISOString()
+            };
+            if (emailError) emailEntry.errorReason = emailError;
+            if (emailStatus === "Enviado") emailEntry.sent_at = new Date().toISOString();
+            currentQueue.unshift(emailEntry);
+            localStorage.setItem("urena_unified_message_queue", JSON.stringify(currentQueue));
+          } catch(e) {
+            console.warn("Error guardando log local:", e);
+          }
+
+          if (window.supabaseClient) {
+            window.supabaseClient.from("email_queue").insert([
+              {
+                email: email,
+                recipient: name,
+                subject: emailSubject,
+                body: `Cita agendada para ${service} el ${date} a las ${time}`,
+                status: emailStatus
+              }
+            ]).then(r => console.log("Log email en Supabase:", r));
+          }
+        })();
       }, 700);
     }
   </script>
