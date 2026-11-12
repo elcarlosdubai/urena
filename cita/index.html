@@ -208,8 +208,8 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Correo Electrónico (Opcional)</label>
-                <input type="email" id="clientEmail" placeholder="juan@ejemplo.com" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-medium" />
+                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Correo Electrónico *</label>
+                <input required type="email" id="clientEmail" placeholder="juan@ejemplo.com" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-medium" />
               </div>
 
               <div>
@@ -257,14 +257,21 @@
 
           <!-- TARJETA ÉXITO (DENTRO DEL REVERSO) -->
           <div id="reversoSuccessCard" class="hidden p-5 rounded-2xl bg-emerald-50 border-2 border-[#28D070] text-center space-y-3 mt-4">
-            <div class="w-12 h-12 bg-[#28D070] text-black rounded-full flex items-center justify-center text-xl mx-auto font-black">
+            <div class="flex justify-center mb-2">
+              <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="h-11 w-auto" />
+            </div>
+            <div class="w-12 h-12 bg-[#28D070] text-black rounded-full flex items-center justify-center text-xl mx-auto font-black shadow-sm">
               ✓
             </div>
-            <h3 class="text-base font-black text-[#1F2937]">¡Cita Registrada en Ureña Tax!</h3>
-            <p class="text-xs text-[#59595B]">Tu solicitud ya entró al sistema administrativo y te hemos reservado el 10% de descuento.</p>
-            <a id="reversoWaBtn" href="#" target="_blank" class="inline-flex items-center justify-center gap-2 py-3 px-5 bg-black hover:bg-neutral-900 text-[#28D070] font-black rounded-xl text-xs shadow-md">
-              <i class="fa-brands fa-whatsapp text-base"></i> Abrir WhatsApp para Confirmar
-            </a>
+            <h3 class="text-base font-black text-[#1F2937]">¡Cita Registrada con Éxito!</h3>
+            <p class="text-xs text-[#59595B] leading-relaxed">
+              Hemos enviado la confirmación a tu correo. Tu solicitud entró a nuestra cola de atención y un asesor validará tu cita a la brevedad.
+            </p>
+            <div class="pt-2">
+              <a href="/" class="inline-flex items-center justify-center gap-2 py-3 px-6 bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs shadow-md transition-all transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-arrow-left"></i> Volver a la Página Principal
+              </a>
+            </div>
           </div>
         </div>
 
@@ -586,16 +593,48 @@
         document.getElementById("qrBookingForm").classList.add("hidden");
         document.getElementById("reversoSuccessCard").classList.remove("hidden");
 
-        // 4. PREPARAR LINK DE WHATSAPP
-        const cleanPhone = "15512321994";
-        const textMsg = encodeURIComponent(`¡Hola Ureña Tax! Escaneé el volante interactivo y agendé mi cita con el 10% de descuento:\n\n👤 Nombre: ${name}\n📱 Teléfono: ${phone}\n📌 Servicio: ${service}\n📅 Fecha: ${date}\n⏰ Hora: ${time}\n\n¿Me confirman si recibieron mi cita? ¡Gracias!`);
-        const waLink = `https://wa.me/${cleanPhone}?text=${textMsg}`;
-        document.getElementById("reversoWaBtn").href = waLink;
+                // 4. ENCOLAR MENSAJE EN LA COLA UNIFICADA (EMAIL & WHATSAPP BAILEYS)
+        const waText = `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;
+        const emailSubject = `Confirmación de Cita (10% Descuento) - Ureña Tax`;
 
-        setTimeout(() => {
-          window.open(waLink, '_blank');
-        }, 1000);
+        try {
+          const currentQueue = JSON.parse(localStorage.getItem("urena_unified_message_queue") || "[]");
+          currentQueue.unshift({
+            id: Date.now() + "-wa",
+            channel: "whatsapp",
+            recipient: name,
+            contact: phone,
+            subject: "Confirmación WhatsApp (Baileys)",
+            message: waText,
+            status: "Pendiente",
+            created_at: new Date().toISOString()
+          });
+          currentQueue.unshift({
+            id: Date.now() + "-em",
+            channel: "email",
+            recipient: name,
+            contact: email,
+            subject: emailSubject,
+            message: `Servicio: ${service} | Fecha: ${date} ${time}`,
+            status: "Pendiente",
+            created_at: new Date().toISOString()
+          });
+          localStorage.setItem("urena_unified_message_queue", JSON.stringify(currentQueue));
+        } catch(e) {
+          console.warn("Error guardando cola local:", e);
+        }
 
+        if (window.supabaseClient) {
+          window.supabaseClient.from("email_queue").insert([
+            {
+              email: email,
+              recipient: name,
+              subject: emailSubject,
+              body: `Cita agendada para ${service} el ${date} a las ${time}`,
+              status: "Pendiente"
+            }
+          ]).then(r => console.log("Encolado email en Supabase:", r));
+        }
       }, 700);
     }
   </script>
