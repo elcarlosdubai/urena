@@ -177,12 +177,18 @@
     ]
   }
   </script>
-  <!-- Supabase Client SDK -->
+  <!-- Supabase Client SDK Asíncrono sin bloqueo -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     window.SUPABASE_URL = "https://iqnigpsrmfiiydxyietl.supabase.co";
     window.SUPABASE_ANON = "sb_publishable_bQ8QtLiqktNlmpfBUzyDXg_gjn5JY2h";
-    window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+    function initSupabase() {
+      if (window.supabase && !window.supabaseClient) {
+        window.supabaseClient = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+      }
+    }
+    window.addEventListener('DOMContentLoaded', initSupabase);
+    window.addEventListener('load', initSupabase);
   </script>
 
   <!-- Google Fonts Outfit Optimizado -->
