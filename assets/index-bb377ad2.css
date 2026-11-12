@@ -4,14 +4,14 @@
   position: fixed !important;
   inset: 0 !important;
   z-index: 99999 !important;
-  pointer-events: none;
+  pointer-events: none !important;
   opacity: 0;
-  transition: opacity 0.25s ease-in-out;
-  display: flex !important;
+  display: none !important;
   justify-content: center;
   align-items: center;
 }
 .postcard-modal-overlay.active {
+  display: flex !important;
   pointer-events: auto !important;
   opacity: 1 !important;
 }
