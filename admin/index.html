@@ -2901,7 +2901,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
         if (!res.ok) throw new Error(data.error || "Error HTTP " + res.status);
         return true;
       } else {
-        const baileysUrl = localStorage.getItem("baileys_service_url") || "http://localhost:3001";
+        const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
         const cleanPhone = (item.contact || "").replace(/\D/g, "");
         if (cleanPhone.length < 7) {
           throw new Error("Número WhatsApp inválido: " + (item.contact || "vacío"));
@@ -2973,7 +2973,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     // COMUNICACIÓN CON SERVICIO BAILEYS (NAMECHEAP / NODE.JS)
     // =========================================================================
     async function checkBaileysServerStatus() {
-      const baileysUrl = localStorage.getItem("baileys_service_url") || "http://localhost:3001";
+      const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
       try {
         const res = await fetch(`${baileysUrl}/status`, { signal: AbortSignal.timeout(3000) });
         if (res.ok) {
