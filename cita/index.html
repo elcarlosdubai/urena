@@ -44,6 +44,152 @@
     .flip-card-inner.is-flipped .postcard-front {
       pointer-events: none;
     }
+
+    /* SQUARE APPOINTMENTS EXACT STYLE DATE & TIME PICKER */
+    .sq-picker-box {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .sq-nav-btn {
+      width: 34px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .sq-nav-btn:hover:not(:disabled) {
+      background: #f3f4f6;
+    }
+    .sq-nav-btn:disabled {
+      background: #f3f4f6;
+      border-color: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    .sq-week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .sq-day-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px 2px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .sq-day-btn:hover:not(:disabled):not(.is-selected) {
+      border-color: #111827;
+      background: #f9fafb;
+    }
+    .sq-day-btn:disabled {
+      background: transparent;
+      border-color: transparent;
+      cursor: not-allowed;
+    }
+    .sq-day-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: #4b5563;
+      line-height: 1.2;
+    }
+    .sq-day-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.2;
+    }
+    .sq-day-btn:disabled .sq-day-name {
+      color: #6b7280;
+    }
+    .sq-day-btn:disabled .sq-day-num {
+      color: #9ca3af;
+      text-decoration: line-through;
+      font-weight: 500;
+    }
+    .sq-day-btn.is-selected {
+      background: #000000;
+      border-color: #000000;
+    }
+    .sq-day-btn.is-selected .sq-day-name,
+    .sq-day-btn.is-selected .sq-day-num {
+      color: #ffffff;
+    }
+    .sq-expand-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 9999px;
+      background: #f3f4f6;
+      color: #111827;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.2s ease;
+    }
+    .sq-expand-btn:hover {
+      background: #e5e7eb;
+    }
+    .sq-expand-btn.is-open {
+      transform: rotate(180deg);
+    }
+    .sq-time-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (min-width: 480px) {
+      .sq-time-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+    .sq-time-btn {
+      padding: 10px 4px;
+      border-radius: 8px;
+      border: 1px solid #f3f4f6;
+      background: #f3f4f6;
+      color: #111827;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .sq-time-btn:hover:not(:disabled):not(.is-selected) {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+    }
+    .sq-time-btn.is-selected {
+      background: #000000;
+      border-color: #000000;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .sq-time-btn:disabled {
+      background: #f9fafb;
+      border-color: #f3f4f6;
+      color: #9ca3af;
+      text-decoration: line-through;
+      cursor: not-allowed;
+    }
   </style>
   <!-- Supabase Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -232,23 +378,49 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label data-i18n="lblDate" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Día de Preferencia *</label>
-                <input required type="date" id="clientDate" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-bold" />
+            <div class="sq-picker-box">
+              <!-- Encabezado de Mes + Flechas de Semana/Mes (Estilo Square) -->
+              <div class="flex items-center justify-between mb-3">
+                <span id="bookingMonthLabel" class="text-lg font-extrabold text-[#111827] tracking-tight">Nov 2026</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="prevWeekBtn" onclick="shiftBookingRange(-1)" aria-label="Anterior" class="sq-nav-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                  <button type="button" id="nextWeekBtn" onclick="shiftBookingRange(1)" aria-label="Siguiente" class="sq-nav-btn">
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <label data-i18n="lblTime" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Hora Estimada *</label>
-                <select required id="clientTime" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-bold">
-                  <option value="10:00 AM">10:00 AM</option>
-                  <option value="11:30 AM">11:30 AM</option>
-                  <option value="01:00 PM">01:00 PM</option>
-                  <option value="02:30 PM">02:30 PM</option>
-                  <option value="04:00 PM">04:00 PM</option>
-                  <option value="05:30 PM">05:30 PM</option>
-                </select>
+              <input type="hidden" id="clientDate" />
+
+              <!-- Vista Semanal de 7 Días (Dom - Sáb) -->
+              <div id="dateStripContainer" class="sq-week-grid"></div>
+
+              <!-- Vista Mensual Expandible (oculta hasta tocar ⌄) -->
+              <div id="fullMonthCalendar" class="hidden mt-2">
+                <div id="fullMonthWeekHeaders" class="sq-week-grid mb-1 text-center text-[11px] font-semibold text-gray-500"></div>
+                <div id="fullMonthDaysGrid" class="sq-week-grid"></div>
               </div>
+
+              <!-- Botón circular para expandir/contraer mes completo -->
+              <div class="flex justify-center mt-3">
+                <button type="button" id="expandCalendarBtn" onclick="toggleFullMonthView()" aria-label="Ver mes completo" class="sq-expand-btn">
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
+
+              <div class="border-t border-gray-100 my-3"></div>
+              <p id="timezoneNote" class="text-center text-xs text-gray-600 mb-3">
+                Horarios en hora <span class="text-[#2563EB] font-semibold">EST</span>.
+              </p>
+
+              <!-- Fecha Seleccionada + Grupos Morning / Afternoon / Evening -->
+              <h4 id="selectedDateBadge" class="text-base font-extrabold text-[#111827] mb-3"></h4>
+              <div id="dateNoticeMsg" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold mb-3"></div>
+
+              <select required id="clientTime" class="hidden"></select>
+              <div id="timeSlotsGrid" class="space-y-4"></div>
             </div>
 
             <div>
@@ -336,7 +508,7 @@
       workDays: [1, 2, 3, 4, 5, 6], // Lun a Sab
       openTime: "09:00",
       closeTime: "18:00",
-      slotDuration: 15,
+      slotDuration: 30,
       blockedDates: ["2026-11-26"]
     };
 
@@ -355,7 +527,7 @@
               workDays: data.work_days || [1,2,3,4,5,6],
               openTime: data.open_time || "09:00",
               closeTime: data.close_time || "18:00",
-              slotDuration: data.slot_duration || 15,
+              slotDuration: data.slot_duration || 30,
               blockedDates: data.blocked_dates || ["2026-11-26"]
             };
           }
@@ -370,6 +542,7 @@
         try { currentSchedule = JSON.parse(local); } catch(e) {}
       }
 
+      renderBookingDateStrip();
       updateAvailableTimeSlots();
     }
 
@@ -381,36 +554,235 @@
       return `${hStr}:${mStr} ${ampm}`;
     }
 
+    const tomorrowDate = new Date();
+    tomorrowDate.setHours(0, 0, 0, 0);
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const minBookingIso = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
+
+    let bookingViewYear = tomorrowDate.getFullYear();
+    let bookingViewMonth = tomorrowDate.getMonth();
+
+    function formatDateIso(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+
+    function isBookingDateAvailable(dateObj) {
+      const iso = formatDateIso(dateObj);
+      if (iso < minBookingIso) return false;
+      const dow = dateObj.getDay();
+      if (!currentSchedule.workDays.includes(dow)) return false;
+      if ((currentSchedule.blockedDates || []).includes(iso)) return false;
+      return true;
+    }
+
+    function getBookingIsEn() {
+      return (window.currentCitaLang || localStorage.getItem("urena_cita_lang")) === "en";
+    }
+
+    function getWeekStartSunday(d) {
+      const copy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      copy.setDate(copy.getDate() - copy.getDay());
+      return copy;
+    }
+
+    let weekStartDate = getWeekStartSunday(tomorrowDate);
+    let isFullMonthOpen = false;
+
+    function shiftBookingRange(delta) {
+      if (isFullMonthOpen) {
+        const nextMonth = new Date(bookingViewYear, bookingViewMonth + delta, 1);
+        const minMonthStart = new Date(tomorrowDate.getFullYear(), tomorrowDate.getMonth(), 1);
+        if (nextMonth < minMonthStart) return;
+        bookingViewYear = nextMonth.getFullYear();
+        bookingViewMonth = nextMonth.getMonth();
+        weekStartDate = getWeekStartSunday(nextMonth < tomorrowDate ? tomorrowDate : nextMonth);
+      } else {
+        const nextWeek = new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate() + delta * 7);
+        const minWeekStart = getWeekStartSunday(tomorrowDate);
+        if (nextWeek < minWeekStart) return;
+        weekStartDate = nextWeek;
+        const midWeek = new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate() + 3);
+        bookingViewYear = midWeek.getFullYear();
+        bookingViewMonth = midWeek.getMonth();
+      }
+      renderBookingDateStrip(false);
+    }
+
+    function toggleFullMonthView() {
+      isFullMonthOpen = !isFullMonthOpen;
+      const fullCal = document.getElementById("fullMonthCalendar");
+      const weekStrip = document.getElementById("dateStripContainer");
+      const expandBtn = document.getElementById("expandCalendarBtn");
+      if (fullCal) fullCal.classList.toggle("hidden", !isFullMonthOpen);
+      if (weekStrip) weekStrip.classList.toggle("hidden", isFullMonthOpen);
+      if (expandBtn) expandBtn.classList.toggle("is-open", isFullMonthOpen);
+      renderBookingDateStrip(false);
+    }
+
+    function selectBookingDate(iso) {
+      const dateInput = document.getElementById("clientDate");
+      if (!dateInput) return;
+      dateInput.value = iso;
+      const [y, m, d] = iso.split("-").map(Number);
+      const picked = new Date(y, m - 1, d);
+      weekStartDate = getWeekStartSunday(picked);
+      bookingViewYear = y;
+      bookingViewMonth = m - 1;
+      if (isFullMonthOpen) toggleFullMonthView();
+      else renderBookingDateStrip(false);
+      updateAvailableTimeSlots();
+    }
+
+    function renderBookingDateStrip() {
+      const strip = document.getElementById("dateStripContainer");
+      const monthLabel = document.getElementById("bookingMonthLabel");
+      const prevBtn = document.getElementById("prevWeekBtn");
+      const dateInput = document.getElementById("clientDate");
+      const badge = document.getElementById("selectedDateBadge");
+      const tzNote = document.getElementById("timezoneNote");
+      if (!strip || !dateInput) return;
+
+      const isEn = getBookingIsEn();
+      const shortMonthsEs = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+      const shortMonthsEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const shortDaysEs = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+      const shortDaysEn = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const fullDaysEs = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const fullDaysEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+      const shortMonths = isEn ? shortMonthsEn : shortMonthsEs;
+      const shortDays = isEn ? shortDaysEn : shortDaysEs;
+      const fullDays = isEn ? fullDaysEn : fullDaysEs;
+
+      if (tzNote) {
+        tzNote.innerHTML = isEn
+          ? `Times are shown in <span class="text-[#2563EB] font-semibold">EST</span>.`
+          : `Horarios en hora <span class="text-[#2563EB] font-semibold">EST</span>.`;
+      }
+
+      const selectedIso = dateInput.value;
+
+      if (monthLabel) {
+        monthLabel.textContent = `${shortMonths[bookingViewMonth]} ${bookingViewYear}`;
+      }
+      if (prevBtn) {
+        const minWeekStart = getWeekStartSunday(tomorrowDate);
+        const minMonthStart = new Date(tomorrowDate.getFullYear(), tomorrowDate.getMonth(), 1);
+        prevBtn.disabled = isFullMonthOpen
+          ? (bookingViewYear === minMonthStart.getFullYear() && bookingViewMonth === minMonthStart.getMonth())
+          : (weekStartDate <= minWeekStart);
+      }
+
+      // Renderizar la fila de 7 días (Domingo a Sábado) exactamente como Square
+      strip.innerHTML = "";
+      for (let i = 0; i < 7; i++) {
+        const dt = new Date(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate() + i);
+        const iso = formatDateIso(dt);
+        const available = isBookingDateAvailable(dt);
+        const isSelected = iso === selectedIso;
+        const dow = dt.getDay();
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.disabled = !available;
+        btn.dataset.iso = iso;
+        btn.className = isSelected ? "sq-day-btn is-selected" : "sq-day-btn";
+        btn.innerHTML = `
+          <span class="sq-day-name">${shortDays[dow]}</span>
+          <span class="sq-day-num">${dt.getDate()}</span>
+        `;
+        if (available) {
+          btn.onclick = () => selectBookingDate(iso);
+        }
+        strip.appendChild(btn);
+      }
+
+      // Renderizar calendario mensual completo si está abierto
+      const fullHeaders = document.getElementById("fullMonthWeekHeaders");
+      const fullGrid = document.getElementById("fullMonthDaysGrid");
+      if (fullHeaders && fullGrid && isFullMonthOpen) {
+        fullHeaders.innerHTML = shortDays.map(d => `<span>${d}</span>`).join("");
+        fullGrid.innerHTML = "";
+        const firstDow = new Date(bookingViewYear, bookingViewMonth, 1).getDay();
+        const daysInMonth = new Date(bookingViewYear, bookingViewMonth + 1, 0).getDate();
+        for (let b = 0; b < firstDow; b++) {
+          const empty = document.createElement("div");
+          fullGrid.appendChild(empty);
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dt = new Date(bookingViewYear, bookingViewMonth, d);
+          const iso = formatDateIso(dt);
+          const available = isBookingDateAvailable(dt);
+          const isSelected = iso === selectedIso;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.disabled = !available;
+          btn.className = isSelected ? "sq-day-btn is-selected" : "sq-day-btn";
+          btn.innerHTML = `<span class="sq-day-num">${d}</span>`;
+          if (available) btn.onclick = () => selectBookingDate(iso);
+          fullGrid.appendChild(btn);
+        }
+      }
+
+      if (badge && selectedIso) {
+        const [sy, sm, sd] = selectedIso.split("-").map(Number);
+        const sdt = new Date(sy, sm - 1, sd);
+        badge.textContent = isEn
+          ? `${fullDays[sdt.getDay()]}, ${shortMonths[sm - 1]} ${sd}, ${sy}`
+          : `${fullDays[sdt.getDay()]}, ${sd} ${shortMonths[sm - 1]}, ${sy}`;
+      }
+    }
+
+    function selectTimeSlotButton(timeValue) {
+      const timeSelect = document.getElementById("clientTime");
+      const grid = document.getElementById("timeSlotsGrid");
+      if (!timeSelect || !grid) return;
+
+      timeSelect.value = timeValue;
+      grid.querySelectorAll("button[data-time]").forEach(btn => {
+        if (btn.dataset.time === timeValue) {
+          btn.className = "sq-time-btn is-selected";
+        } else {
+          btn.className = "sq-time-btn";
+        }
+      });
+    }
+
     async function updateAvailableTimeSlots() {
       const dateInput = document.getElementById("clientDate");
       const timeSelect = document.getElementById("clientTime");
+      const grid = document.getElementById("timeSlotsGrid");
       if (!dateInput || !timeSelect) return;
 
       const selectedDate = dateInput.value;
       if (!selectedDate) return;
 
+      const isEn = getBookingIsEn();
+
       // Validar si el día de la semana está abierto
       const parts = selectedDate.split("-");
       const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
       const dayOfWeek = dateObj.getDay(); // 0=Dom, 1=Lun, etc.
-      const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const dayNames = isEn
+        ? ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        : ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
       let dateError = document.getElementById("dateNoticeMsg");
       const isClosedDay = !currentSchedule.workDays.includes(dayOfWeek);
       const isBlockedHoliday = (currentSchedule.blockedDates || []).includes(selectedDate);
 
       if (isClosedDay || isBlockedHoliday) {
-        if (!dateError) {
-          dateError = document.createElement("div");
-          dateError.id = "dateNoticeMsg";
-          dateError.className = "p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold mt-1";
-          dateInput.parentNode.appendChild(dateError);
+        if (dateError) {
+          dateError.classList.remove("hidden");
+          dateError.innerHTML = isEn
+            ? `<i class="fa-solid fa-circle-exclamation"></i> Ureña Tax office is closed on <strong>${dayNames[dayOfWeek]}</strong>. Please select another day.`
+            : `<i class="fa-solid fa-circle-exclamation"></i> La oficina de Ureña Tax está cerrada los días <strong>${dayNames[dayOfWeek]}</strong>. Por favor selecciona otro día hábil.`;
         }
-        dateError.classList.remove("hidden");
-        dateError.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> La oficina de Ureña Tax está cerrada los días <strong>${dayNames[dayOfWeek]}</strong>. Por favor selecciona otro día hábil.`;
-        
         timeSelect.innerHTML = `<option value="">-- Oficina Cerrada este día --</option>`;
         timeSelect.disabled = true;
+        if (grid) {
+          grid.innerHTML = `<div class="col-span-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-center text-xs font-bold text-gray-500">${isEn ? "Closed on this day" : "Oficina cerrada este día"}</div>`;
+        }
         return;
       } else {
         if (dateError) dateError.classList.add("hidden");
@@ -447,8 +819,16 @@
       let currentMinutes = startH * 60 + startM;
       const endMinutes = endH * 60 + endM;
 
+      const prevSelectedTime = timeSelect.value;
       timeSelect.innerHTML = "";
+      if (grid) grid.innerHTML = "";
       let availableSlotsCount = 0;
+      let firstAvailableTime = "";
+      const groups = {
+        morning: [],
+        afternoon: [],
+        evening: []
+      };
 
       while (currentMinutes + slot <= endMinutes) {
         const h = Math.floor(currentMinutes / 60);
@@ -465,26 +845,78 @@
         } else {
           opt.textContent = `${timeFormatted} — (Disponible)`;
           availableSlotsCount++;
+          if (!firstAvailableTime) firstAvailableTime = timeFormatted;
         }
 
         timeSelect.appendChild(opt);
+
+        const item = { timeFormatted, isOccupied };
+        if (h < 12) groups.morning.push(item);
+        else if (h < 17) groups.afternoon.push(item);
+        else groups.evening.push(item);
+
         currentMinutes += slot;
+      }
+
+      if (grid) {
+        const groupDefs = [
+          { key: "morning", label: isEn ? "Morning" : "Mañana" },
+          { key: "afternoon", label: isEn ? "Afternoon" : "Tarde" },
+          { key: "evening", label: isEn ? "Evening" : "Noche" }
+        ];
+
+        groupDefs.forEach(def => {
+          const section = document.createElement("div");
+          const heading = document.createElement("div");
+          heading.className = "text-xs font-bold text-[#111827] mb-2";
+          heading.textContent = def.label;
+          section.appendChild(heading);
+
+          const openItems = groups[def.key].filter(x => !x.isOccupied);
+          if (openItems.length === 0) {
+            const emptyMsg = document.createElement("p");
+            emptyMsg.className = "text-xs text-gray-500";
+            emptyMsg.textContent = isEn ? "No availability" : "Sin disponibilidad";
+            section.appendChild(emptyMsg);
+          } else {
+            const btnGrid = document.createElement("div");
+            btnGrid.className = "sq-time-grid";
+            groups[def.key].forEach(item => {
+              if (item.isOccupied) return;
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.dataset.time = item.timeFormatted;
+              btn.className = "sq-time-btn";
+              btn.textContent = item.timeFormatted;
+              btn.onclick = () => selectTimeSlotButton(item.timeFormatted);
+              btnGrid.appendChild(btn);
+            });
+            section.appendChild(btnGrid);
+          }
+          grid.appendChild(section);
+        });
       }
 
       if (availableSlotsCount === 0) {
         timeSelect.innerHTML = `<option value="">-- No hay cupos disponibles para esta fecha --</option>`;
         timeSelect.disabled = true;
+      } else {
+        const validPrev = prevSelectedTime && !occupiedHours.includes(prevSelectedTime) && Array.from(timeSelect.options).some(o => o.value === prevSelectedTime && !o.disabled);
+        selectTimeSlotButton(validPrev ? prevSelectedTime : firstAvailableTime);
       }
     }
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const yyyy = tomorrow.getFullYear();
-    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const dd = String(tomorrow.getDate()).padStart(2, '0');
-    document.getElementById("clientDate").value = `${yyyy}-${mm}-${dd}`;
-    document.getElementById("clientDate").min = `${yyyy}-${mm}-${dd}`;
-    document.getElementById("clientDate").addEventListener("change", updateAvailableTimeSlots);
+    // Seleccionar primer día hábil disponible por defecto
+    let initialDate = new Date(tomorrowDate);
+    for (let i = 0; i < 14; i++) {
+      if (isBookingDateAvailable(initialDate)) break;
+      initialDate.setDate(initialDate.getDate() + 1);
+    }
+    weekStartDate = getWeekStartSunday(initialDate);
+    bookingViewYear = initialDate.getFullYear();
+    bookingViewMonth = initialDate.getMonth();
+    document.getElementById("clientDate").value = formatDateIso(initialDate);
+    renderBookingDateStrip();
     setTimeout(loadScheduleConfig, 300);
 
     function handleQrBooking(e) {
@@ -768,6 +1200,7 @@
 
     function applyCitaLanguage(lang) {
       currentCitaLang = lang === "en" ? "en" : "es";
+      window.currentCitaLang = currentCitaLang;
       try { localStorage.setItem("urena_cita_lang", currentCitaLang); } catch (e) {}
       document.documentElement.lang = currentCitaLang;
 
@@ -805,6 +1238,9 @@
       if (nameIn) nameIn.placeholder = dict.phName;
       if (emailIn) emailIn.placeholder = dict.phEmail;
       if (notesIn) notesIn.placeholder = dict.phNotes;
+
+      if (typeof renderBookingDateStrip === "function") renderBookingDateStrip(false);
+      if (typeof updateAvailableTimeSlots === "function") updateAvailableTimeSlots();
 
       const flagEs = document.getElementById("flagEsImg");
       const flagEn = document.getElementById("flagEnImg");
