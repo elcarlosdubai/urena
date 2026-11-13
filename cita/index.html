@@ -443,13 +443,13 @@
             <div class="w-12 h-12 bg-[#28D070] text-black rounded-full flex items-center justify-center text-xl mx-auto font-black shadow-sm">
               ✓
             </div>
-            <h3 class="text-base font-black text-[#1F2937]">¡Cita Registrada con Éxito!</h3>
-            <p class="text-xs text-[#59595B] leading-relaxed">
+            <h3 data-i18n="successTitle" class="text-base font-black text-[#1F2937]">¡Cita Registrada con Éxito!</h3>
+            <p data-i18n="successDesc" class="text-xs text-[#59595B] leading-relaxed">
               Hemos enviado la confirmación a tu correo. Tu solicitud entró a nuestra cola de atención y un asesor validará tu cita a la brevedad.
             </p>
             <div class="pt-2">
               <a href="/" class="inline-flex items-center justify-center gap-2 py-3 px-6 bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs shadow-md transition-all transform hover:-translate-y-0.5">
-                <i class="fa-solid fa-arrow-left"></i> Volver a la Página Principal
+                <i class="fa-solid fa-arrow-left"></i> <span data-i18n="btnHome">Volver a la Página Principal</span>
               </a>
             </div>
           </div>
@@ -1025,9 +1025,11 @@
         if (volverBtn) volverBtn.style.display = "none";
 
         // 4. ENVIAR CORREO DE CONFIRMACIÓN AL INSTANTE Y REGISTRAR LOG
+        const serviceEl = document.getElementById("clientService");
+        const serviceLabel = (serviceEl && serviceEl.options[serviceEl.selectedIndex]) ? serviceEl.options[serviceEl.selectedIndex].text : service;
         const waText = currentCitaLang === "en"
-          ? `Hi ${name}! We received your appointment request at URENA TAX for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly.${isNormalAppointment ? "" : " Your 10% discount is locked in!"}`
-          : `¡Hola ${name}! Recibimos tu solicitud de cita en URENA TAX para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ.${isNormalAppointment ? "" : " ¡Tu 10% de descuento está asegurado!"}`;
+          ? `Hi ${name}! We received your appointment request at URENA TAX for ${serviceLabel} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly.${isNormalAppointment ? "" : " Your 10% discount is locked in!"}`
+          : `¡Hola ${name}! Recibimos tu solicitud de cita en URENA TAX para ${serviceLabel} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ.${isNormalAppointment ? "" : " ¡Tu 10% de descuento está asegurado!"}`;
         const emailSubject = currentCitaLang === "en"
           ? (isNormalAppointment ? `Appointment Confirmation - URENA TAX` : `Appointment Confirmation (10% OFF) - URENA TAX`)
           : (isNormalAppointment ? `Confirmación de Cita - URENA TAX` : `Confirmación de Cita (10% Descuento) - URENA TAX`);
@@ -1046,7 +1048,7 @@
                 name,
                 phone,
                 email,
-                service,
+                service: serviceLabel,
                 date,
                 time,
                 notes
@@ -1159,7 +1161,10 @@
         btnSubmit: "Confirmar Cita & Reclamar 10% OFF",
         phName: "Ej: Juan Perez",
         phEmail: "juan@ejemplo.com",
-        phNotes: "Ej: Vengo con pasaporte original para ITIN"
+        phNotes: "Ej: Vengo con pasaporte original para ITIN",
+        successTitle: "¡Cita Registrada con Éxito!",
+        successDesc: "Hemos enviado la confirmación a tu correo. Tu solicitud entró a nuestra cola de atención y un asesor validará tu cita a la brevedad.",
+        btnHome: "Volver a la Página Principal"
       },
       en: {
         badgeSeason: "2026 Tax Season",
@@ -1191,7 +1196,10 @@
         btnSubmit: "Confirm Appointment & Claim 10% OFF",
         phName: "e.g. John Doe",
         phEmail: "john@example.com",
-        phNotes: "e.g. Bringing original passport for ITIN"
+        phNotes: "e.g. Bringing original passport for ITIN",
+        successTitle: "Appointment Booked Successfully!",
+        successDesc: "We've sent a confirmation to your email. Your request is now in our queue and an advisor will confirm your appointment shortly.",
+        btnHome: "Back to Home Page"
       }
     };
 

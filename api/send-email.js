@@ -95,11 +95,11 @@ module.exports = async function handler(req, res) {
     if (email && email.includes('@')) {
       const appointmentClientHtml = `
       <!DOCTYPE html>
-      <html lang="es">
+      <html lang="${isEn ? 'en' : 'es'}">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Confirmación de Cita | URENA TAX</title>
+        <title>${isEn ? 'Appointment Confirmation | URENA TAX' : 'Confirmación de Cita | URENA TAX'}</title>
       </head>
       <body style="margin: 0; padding: 0; background-color: #F4F5F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F4F5F6; padding: 30px 10px;">
@@ -112,9 +112,9 @@ module.exports = async function handler(req, res) {
                   <td style="background-color: #FFFFFF; padding: 28px 24px 20px 24px; text-align: center; border-bottom: 4px solid #28D070;">
                     <img src="${LOGO_URL}" alt="URENA TAX" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
                     <div style="display: inline-block; background-color: #ECFDF5; color: #047857; font-size: 11px; font-weight: 800; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px; border: 1px solid #A7F3D0; margin-bottom: 8px;">
-                      ✓ Cita Confirmada
+                      ${isEn ? '✓ Appointment Confirmed' : '✓ Cita Confirmada'}
                     </div>
-                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">¡Tu Cita Ha Sido Reservada!</h1>
+                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">${isEn ? 'Your Appointment Has Been Reserved!' : '¡Tu Cita Ha Sido Reservada!'}</h1>
                     <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px; font-weight: 500;">Accounting • Business Tax • ITIN Specialist</p>
                   </td>
                 </tr>
@@ -123,46 +123,48 @@ module.exports = async function handler(req, res) {
                 <tr>
                   <td style="padding: 28px 24px;">
                     <p style="font-size: 16px; font-weight: bold; margin-top: 0; color: #111827;">
-                      Hola <strong>${name || 'Estimado(a) Cliente'}</strong> 👋
+                      ${isEn ? 'Hi' : 'Hola'} <strong>${name || (isEn ? 'Valued Client' : 'Estimado(a) Cliente')}</strong> 👋
                     </p>
                     <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 22px;">
-                      Hemos reservado tu espacio en nuestro calendario para brindarte atención personalizada.${isNormalCita ? '' : ' A continuación tienes los detalles de tu cita y tu beneficio aplicado:'}
+                      ${isEn
+                        ? `We have reserved your spot on our calendar to provide you with personalized service.${isNormalCita ? '' : ' Below are your appointment details and your applied benefit:'}`
+                        : `Hemos reservado tu espacio en nuestro calendario para brindarte atención personalizada.${isNormalCita ? '' : ' A continuación tienes los detalles de tu cita y tu beneficio aplicado:'}`}
                     </p>
 
                     ${isNormalCita ? '' : `<!-- BANNER DE DESCUENTO 10% -->
                     <div style="background-color: #ECFDF5; border: 2px dashed #28D070; border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 24px;">
-                      <span style="display: block; color: #047857; font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">★ BENEFICIO DE TEMPORADA APLICADO ★</span>
-                      <div style="color: #065F46; font-size: 26px; font-weight: 900; margin: 4px 0;">10% DE DESCUENTO</div>
-                      <p style="color: #4B5563; font-size: 12px; margin: 0;">Presenta este correo o menciónalo al momento de tu cita presencial o virtual.</p>
+                      <span style="display: block; color: #047857; font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">${isEn ? '★ SEASONAL BENEFIT APPLIED ★' : '★ BENEFICIO DE TEMPORADA APLICADO ★'}</span>
+                      <div style="color: #065F46; font-size: 26px; font-weight: 900; margin: 4px 0;">${isEn ? '10% OFF' : '10% DE DESCUENTO'}</div>
+                      <p style="color: #4B5563; font-size: 12px; margin: 0;">${isEn ? 'Show this email or mention it at your in-person or virtual appointment.' : 'Presenta este correo o menciónalo al momento de tu cita presencial o virtual.'}</p>
                     </div>`}
 
                     <!-- TABLA DETALLES DEL TURNO -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-bottom: 24px; font-size: 13px; background-color: #F9FAFB; border-radius: 12px; border: 1px solid #E5E7EB;">
                       <tr style="border-bottom: 1px solid #E5E7EB;">
-                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">Servicio Requerido:</td>
-                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${service || 'Declaración de Taxes'}</td>
+                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">${isEn ? 'Service Requested:' : 'Servicio Requerido:'}</td>
+                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${service || (isEn ? 'Tax Preparation' : 'Declaración de Taxes')}</td>
                       </tr>
                       <tr style="border-bottom: 1px solid #E5E7EB;">
-                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">Fecha Reservada:</td>
-                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${date || 'Por coordinar'}</td>
+                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">${isEn ? 'Reserved Date:' : 'Fecha Reservada:'}</td>
+                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${date || (isEn ? 'To be scheduled' : 'Por coordinar')}</td>
                       </tr>
                       <tr style="border-bottom: 1px solid #E5E7EB;">
-                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">Hora del Turno:</td>
-                        <td style="padding: 12px 16px; color: #047857; font-weight: 900; text-align: right;">${time || 'Por coordinar'}</td>
+                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">${isEn ? 'Appointment Time:' : 'Hora del Turno:'}</td>
+                        <td style="padding: 12px 16px; color: #047857; font-weight: 900; text-align: right;">${time || (isEn ? 'To be scheduled' : 'Por coordinar')}</td>
                       </tr>
                       <tr style="border-bottom: 1px solid #E5E7EB;">
-                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">Teléfono Registrado:</td>
-                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${phone || 'No indicado'}</td>
+                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">${isEn ? 'Registered Phone:' : 'Teléfono Registrado:'}</td>
+                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${phone || (isEn ? 'Not provided' : 'No indicado')}</td>
                       </tr>
                       <tr>
-                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">Modalidad / Sede:</td>
-                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">8 Clark St, Paterson, NJ (o Virtual)</td>
+                        <td style="padding: 12px 16px; color: #6B7280; font-weight: 600;">${isEn ? 'Location / Mode:' : 'Modalidad / Sede:'}</td>
+                        <td style="padding: 12px 16px; color: #111827; font-weight: 800; text-align: right;">${isEn ? '8 Clark St, Paterson, NJ (or Virtual)' : '8 Clark St, Paterson, NJ (o Virtual)'}</td>
                       </tr>
                     </table>
 
                     ${notes ? `
                     <div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px; margin-bottom: 22px;">
-                      <span style="color: #6B7280; font-size: 11px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px;">Nota adicional proporcionada:</span>
+                      <span style="color: #6B7280; font-size: 11px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px;">${isEn ? 'Additional note provided:' : 'Nota adicional proporcionada:'}</span>
                       <p style="margin: 0; font-size: 13px; color: #1F2937; font-style: italic;">"${notes}"</p>
                     </div>` : ''}
 
@@ -170,8 +172,8 @@ module.exports = async function handler(req, res) {
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
                       <tr>
                         <td align="center">
-                          <a href="https://wa.me/15512321994?text=Hola%2C%20tengo%20una%20cita%20agendada%20para%20${encodeURIComponent(name || '')}" target="_blank" style="display: inline-block; background-color: #28D070; color: #000000; font-size: 14px; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px;">
-                            Confirmar o Modificar por WhatsApp ➔
+                          <a href="https://wa.me/15512321994?text=${encodeURIComponent(isEn ? `Hi, I have an appointment scheduled for ${name || ''}` : `Hola, tengo una cita agendada para ${name || ''}`)}" target="_blank" style="display: inline-block; background-color: #28D070; color: #000000; font-size: 14px; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px;">
+                            ${isEn ? 'Confirm or Modify via WhatsApp ➔' : 'Confirmar o Modificar por WhatsApp ➔'}
                           </a>
                         </td>
                       </tr>
@@ -179,9 +181,9 @@ module.exports = async function handler(req, res) {
 
                     <!-- OFICINA NEGRA -->
                     <div style="background-color: #111827; color: #FFFFFF; border-radius: 14px; padding: 18px; text-align: center; font-size: 12px; line-height: 1.5;">
-                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal URENA TAX</p>
+                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">${isEn ? '📍 URENA TAX Main Office' : '📍 Oficina Principal URENA TAX'}</p>
                       <p style="margin: 0 0 6px; color: #9CA3AF;">8 Clark St, Paterson, NJ 07505</p>
-                      <p style="margin: 0;">Línea Directa / WhatsApp: <strong style="color: #28D070;">(551) 232-1994</strong></p>
+                      <p style="margin: 0;">${isEn ? 'Direct Line / WhatsApp:' : 'Línea Directa / WhatsApp:'} <strong style="color: #28D070;">(551) 232-1994</strong></p>
                     </div>
                   </td>
                 </tr>
@@ -190,7 +192,7 @@ module.exports = async function handler(req, res) {
                 <tr>
                   <td style="background-color: #F9FAFB; padding: 18px; text-align: center; font-size: 11px; color: #9CA3AF; border-top: 1px solid #E5E7EB; line-height: 1.5;">
                     © 2026 URENA TAX • Paterson, NJ<br>
-                    IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados
+                    ${isEn ? 'IRS Certified Acceptance Agent (CAA) • Certified Accounting & Tax Services' : 'IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados'}
                   </td>
                 </tr>
               </table>
@@ -207,23 +209,7 @@ module.exports = async function handler(req, res) {
           subject: isEn
             ? (isNormalCita ? '🗓️ Appointment Confirmation - URENA TAX' : '🗓️ Appointment Confirmation (10% OFF) - URENA TAX')
             : (isNormalCita ? '🗓️ Confirmación de Cita - URENA TAX' : '🗓️ Confirmación de Cita (10% Descuento) - URENA TAX'),
-          html: isEn
-            ? appointmentClientHtml
-                .replace('lang="es"', 'lang="en"')
-                .replace('Cita Confirmada | URENA TAX', 'Appointment Confirmed | URENA TAX')
-                .replace('¡Tu Cita ha sido Agendada!', 'Your Appointment is Confirmed!')
-                .replace('Confirmación Oficial • Paterson, New Jersey', 'Official Confirmation • Paterson, New Jersey')
-                .replace('Hola <strong>', 'Hi <strong>')
-                .replace('Estimado(a) Cliente', 'Valued Client')
-                .replace('Gracias por agendar con <strong>URENA TAX</strong>. Tu espacio ha sido reservado con tu <strong style="color: #047857;">10% de Descuento</strong> automático.', 'Thank you for booking with <strong>URENA TAX</strong>. Your spot is reserved with your automatic <strong style="color: #047857;">10% OFF</strong>.')
-                .replace('Servicio Solicitado:', 'Service:')
-                .replace('Fecha y Hora:', 'Date & Time:')
-                .replace('Beneficio:', 'Benefit:')
-                .replace('10% de Descuento Aplicado', '10% Discount Applied')
-                .replace('Reagendar o Consultar por WhatsApp ➔', 'Reschedule or Message Us on WhatsApp ➔')
-                .replace('Oficina Principal URENA TAX', 'URENA TAX Main Office')
-                .replace('Línea Directa / WhatsApp:', 'Direct Line / WhatsApp:')
-            : appointmentClientHtml
+          html: appointmentClientHtml
         })
       );
     }
@@ -262,11 +248,11 @@ module.exports = async function handler(req, res) {
     if (email && email.includes('@')) {
       const clientContactHtml = `
       <!DOCTYPE html>
-      <html lang="es">
+      <html lang="${isEn ? 'en' : 'es'}">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Mensaje Recibido | URENA TAX</title>
+        <title>${isEn ? 'Message Received | URENA TAX' : 'Mensaje Recibido | URENA TAX'}</title>
       </head>
       <body style="margin: 0; padding: 0; background-color: #F4F5F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F4F5F6; padding: 30px 10px;">
@@ -278,8 +264,8 @@ module.exports = async function handler(req, res) {
                 <tr>
                   <td style="background-color: #FFFFFF; padding: 28px 24px 20px 24px; text-align: center; border-bottom: 4px solid #28D070;">
                     <img src="${LOGO_URL}" alt="URENA TAX" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
-                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">¡Hemos Recibido tu Consulta!</h1>
-                    <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px; font-weight: 500;">Atención al Cliente • Paterson, New Jersey</p>
+                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">${isEn ? 'We Received Your Inquiry!' : '¡Hemos Recibido tu Consulta!'}</h1>
+                    <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px; font-weight: 500;">${isEn ? 'Customer Support • Paterson, New Jersey' : 'Atención al Cliente • Paterson, New Jersey'}</p>
                   </td>
                 </tr>
 
@@ -287,18 +273,20 @@ module.exports = async function handler(req, res) {
                 <tr>
                   <td style="padding: 28px 24px;">
                     <p style="font-size: 16px; font-weight: bold; margin-top: 0; color: #111827;">
-                      Hola <strong>${name || 'Estimado(a) Cliente'}</strong> 👋
+                      ${isEn ? 'Hi' : 'Hola'} <strong>${name || (isEn ? 'Valued Client' : 'Estimado(a) Cliente')}</strong> 👋
                     </p>
                     <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 22px;">
-                      Gracias por escribir a <strong>URENA TAX</strong>. Hemos recibido tu mensaje correctamente y uno de nuestros asesores se comunicará contigo a la brevedad posible.
+                      ${isEn
+                        ? 'Thank you for writing to <strong>URENA TAX</strong>. We have received your message and one of our advisors will get back to you shortly.'
+                        : 'Gracias por escribir a <strong>URENA TAX</strong>. Hemos recibido tu mensaje correctamente y uno de nuestros asesores se comunicará contigo a la brevedad posible.'}
                     </p>
 
                     <!-- RESUMEN DE SU CONSULTA -->
                     <div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 14px; padding: 18px; margin-bottom: 24px;">
-                      <span style="color: #6B7280; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">Resumen de tu mensaje:</span>
-                      <p style="margin: 0 0 10px; font-size: 13px; color: #374151; font-style: italic; line-height: 1.5;">"${message || 'Sin mensaje adicional'}"</p>
+                      <span style="color: #6B7280; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">${isEn ? 'Summary of your message:' : 'Resumen de tu mensaje:'}</span>
+                      <p style="margin: 0 0 10px; font-size: 13px; color: #374151; font-style: italic; line-height: 1.5;">"${message || (isEn ? 'No additional message' : 'Sin mensaje adicional')}"</p>
                       <div style="font-size: 12px; color: #6B7280; border-top: 1px solid #E5E7EB; padding-top: 10px;">
-                        <strong>Correo de contacto:</strong> ${email}
+                        <strong>${isEn ? 'Contact email:' : 'Correo de contacto:'}</strong> ${email}
                       </div>
                     </div>
 
@@ -307,7 +295,7 @@ module.exports = async function handler(req, res) {
                       <tr>
                         <td align="center">
                           <a href="https://wa.me/15512321994" target="_blank" style="display: inline-block; background-color: #28D070; color: #000000; font-size: 14px; font-weight: 900; text-decoration: none; padding: 14px 28px; border-radius: 12px;">
-                            Escribirnos por WhatsApp ➔
+                            ${isEn ? 'Message Us on WhatsApp ➔' : 'Escribirnos por WhatsApp ➔'}
                           </a>
                         </td>
                       </tr>
@@ -315,9 +303,9 @@ module.exports = async function handler(req, res) {
 
                     <!-- OFICINA NEGRA -->
                     <div style="background-color: #111827; color: #FFFFFF; border-radius: 14px; padding: 18px; text-align: center; font-size: 12px; line-height: 1.5;">
-                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal URENA TAX</p>
+                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">${isEn ? '📍 URENA TAX Main Office' : '📍 Oficina Principal URENA TAX'}</p>
                       <p style="margin: 0 0 6px; color: #9CA3AF;">8 Clark St, Paterson, NJ 07505</p>
-                      <p style="margin: 0;">Línea Directa / WhatsApp: <strong style="color: #28D070;">(551) 232-1994</strong></p>
+                      <p style="margin: 0;">${isEn ? 'Direct Line / WhatsApp:' : 'Línea Directa / WhatsApp:'} <strong style="color: #28D070;">(551) 232-1994</strong></p>
                     </div>
                   </td>
                 </tr>
@@ -326,7 +314,7 @@ module.exports = async function handler(req, res) {
                 <tr>
                   <td style="background-color: #F9FAFB; padding: 18px; text-align: center; font-size: 11px; color: #9CA3AF; border-top: 1px solid #E5E7EB; line-height: 1.5;">
                     © 2026 URENA TAX • Paterson, NJ<br>
-                    IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados
+                    ${isEn ? 'IRS Certified Acceptance Agent (CAA) • Certified Accounting & Tax Services' : 'IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados'}
                   </td>
                 </tr>
               </table>
@@ -340,7 +328,7 @@ module.exports = async function handler(req, res) {
         transporter.sendMail({
           from: '"URENA TAX" <info@urenatax.com>',
           to: email,
-          subject: '✅ Consulta Recibida - URENA TAX',
+          subject: isEn ? '✅ Inquiry Received - URENA TAX' : '✅ Consulta Recibida - URENA TAX',
           html: clientContactHtml
         })
       );
