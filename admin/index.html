@@ -1283,12 +1283,12 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         <p class="text-[11px] font-bold text-[#1F2937]">Vincular WhatsApp de la Oficina</p>
         <p class="text-[10px] text-[#59595B] leading-tight">Abre WhatsApp en tu teléfono > Dispositivos vinculados > Vincular un dispositivo.</p>
         <div class="flex justify-center py-2">
-          <div id="baileysQrPlaceholder" class="w-36 h-36 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-1.5 shadow-xs">
-            <span id="baileysQrLoading" class="text-[10px] text-gray-400 font-medium px-2">Cargando código QR...</span>
+          <div id="baileysQrPlaceholder" class="w-64 h-64 bg-white border border-gray-200 rounded-xl flex items-center justify-center p-2 shadow-sm">
+            <span id="baileysQrLoading" class="text-xs text-gray-400 font-medium px-2">Cargando código QR...</span>
             <img id="baileysQrImg" src="" class="hidden w-full h-full object-contain" alt="QR Baileys" />
           </div>
         </div>
-        <button onclick="checkBaileysServerStatus()" class="py-1 px-3 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg text-[10px] font-bold text-[#59595B]">
+        <button onclick="checkBaileysServerStatus(true)" class="py-1.5 px-4 bg-white hover:bg-gray-100 border border-gray-300 rounded-lg text-xs font-bold text-[#59595B]">
           <i class="fa-solid fa-arrows-rotate"></i> Actualizar QR
         </button>
       </div>
@@ -2208,58 +2208,26 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
 
     window.openWhatsAppStatusModal = function() {
       document.getElementById("modalWhatsAppStatus").classList.remove("hidden");
+      checkBaileysServerStatus(true);
     };
 
     window.closeWhatsAppStatusModal = function() {
       document.getElementById("modalWhatsAppStatus").classList.add("hidden");
     };
 
-    window.toggleWhatsAppConnection = function() {
-      isWhatsAppConnected = !isWhatsAppConnected;
-      const statusPulse = document.getElementById("waStatusPulse");
-      const statusLabel = document.getElementById("waStatusLabel");
-      const statusIcon = document.getElementById("waStatusIcon");
-
-      const modalBox = document.getElementById("waModalStatusBox");
-      const modalPing = document.getElementById("waModalPing");
-      const modalDot = document.getElementById("waModalDot");
-      const modalStateText = document.getElementById("waModalStateText");
-      const toggleBtn = document.getElementById("waToggleConnectBtn");
-      const modalIconBg = document.getElementById("waModalIconBg");
-
-      if (isWhatsAppConnected) {
-        statusPulse.innerHTML = '<span class="animate-ping absolute inline-flex h-2.5 w-2.5 rounded-full bg-[#28D070] opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-[#28D070]"></span>';
-        statusLabel.textContent = "Conectado";
-        statusLabel.className = "text-[9px] font-bold text-[#28D070] uppercase tracking-wider";
-        statusIcon.className = "fa-brands fa-whatsapp text-base text-[#28D070]";
-
-        modalBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between";
-        modalPing.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28D070] opacity-75";
-        modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-[#28D070]";
-        modalStateText.textContent = "En espera de enlace QR";
-        modalStateText.className = "text-[10px] font-bold text-[#28D070]";
-        modalIconBg.className = "w-8 h-8 rounded-xl bg-emerald-50 text-[#28D070] flex items-center justify-center text-sm font-bold";
-
-        toggleBtn.innerHTML = '<i class="fa-solid fa-power-off text-xs"></i> Desconectar Línea';
-        toggleBtn.className = "w-full py-2.5 bg-gray-50 hover:bg-red-50 border border-gray-200 hover:border-red-200 text-[#59595B] hover:text-red-600 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all";
-        alert("Línea WhatsApp vinculada correctamente al servidor.");
-      } else {
-        statusPulse.innerHTML = '<span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>';
-        statusLabel.textContent = "Desconectado";
-        statusLabel.className = "text-[9px] font-bold text-red-500 uppercase tracking-wider";
-        statusIcon.className = "fa-brands fa-whatsapp text-base text-gray-400";
-
-        modalBox.className = "p-3.5 rounded-xl border border-red-200 bg-red-50/60 flex items-center justify-between";
-        modalPing.className = "hidden";
-        modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-red-500";
-        modalStateText.textContent = "Línea desconectada (Sin sesión)";
-        modalStateText.className = "text-[10px] font-bold text-red-500";
-        modalIconBg.className = "w-8 h-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center text-sm font-bold";
-
-        toggleBtn.innerHTML = '<i class="fa-solid fa-link text-xs"></i> Reconectar WhatsApp';
-        toggleBtn.className = "w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 border border-[#28D070] text-[#139C8E] font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all";
-        alert("WhatsApp desconectado. Los envíos por goteo quedarán en pausa hasta volver a conectar.");
-      }
+    window.toggleWhatsAppConnection = async function() {
+      if (!confirm("¿Reiniciar la sesión actual de WhatsApp y generar un código QR nuevo?")) return;
+      const storedUrl = localStorage.getItem("baileys_service_url");
+      const baileysUrl = (storedUrl && !storedUrl.includes("localhost")) ? storedUrl : "https://wa.urenatax.com";
+      const qrLoad = document.getElementById("baileysQrLoading");
+      const qrImg = document.getElementById("baileysQrImg");
+      if (qrImg) qrImg.classList.add("hidden");
+      if (qrLoad) { qrLoad.textContent = "Reiniciando sesión..."; qrLoad.classList.remove("hidden"); }
+      document.getElementById("baileysQrContainer").classList.remove("hidden");
+      try {
+        await fetch(`${baileysUrl}/logout`, { method: "POST", signal: AbortSignal.timeout(8000) });
+      } catch (e) {}
+      setTimeout(() => checkBaileysServerStatus(true), 2500);
     };
 
     window.sendWaTestFromModal = function() {
@@ -3086,12 +3054,24 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     // =========================================================================
     // COMUNICACIÓN CON SERVICIO BAILEYS (NAMECHEAP / NODE.JS)
     // =========================================================================
-    async function checkBaileysServerStatus() {
-      const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
+    async function checkBaileysServerStatus(manual = false) {
+      const storedUrl = localStorage.getItem("baileys_service_url");
+      const baileysUrl = (storedUrl && !storedUrl.includes("localhost")) ? storedUrl : "https://wa.urenatax.com";
+      const qrImg = document.getElementById("baileysQrImg");
+      const qrLoad = document.getElementById("baileysQrLoading");
+      if (manual && qrLoad && (!qrImg || qrImg.classList.contains("hidden"))) {
+        qrLoad.textContent = "Actualizando código QR...";
+        qrLoad.classList.remove("hidden");
+      }
       try {
-        const res = await fetch(`${baileysUrl}/status`, { signal: AbortSignal.timeout(3000) });
+        const res = await fetch(`${baileysUrl}/status?t=${Date.now()}`, {
+          cache: "no-store",
+          signal: AbortSignal.timeout(8000)
+        });
         if (res.ok) {
           const data = await res.json();
+          const modalBox = document.getElementById("waModalStatusBox");
+          const modalDot = document.getElementById("waModalDot");
           if (data.status === "open") {
             document.getElementById("waStatusLabel").textContent = "Conectado";
             const waNumEl = document.getElementById("waHeaderNumber");
@@ -3102,16 +3082,24 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
             if (waModalNum && (data.phone || data.number)) waModalNum.textContent = "+" + String(data.phone || data.number).replace(/^\+/, "");
             document.getElementById("waModalStateText").textContent = "Línea Vinculada y Activa";
             document.getElementById("waModalStateText").className = "text-[10px] font-bold text-emerald-700";
+            if (modalBox) modalBox.className = "p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/60 flex items-center justify-between";
+            if (modalDot) modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-[#28D070]";
             document.getElementById("baileysQrContainer").classList.add("hidden");
           } else if (data.qr) {
-            const qrImg = document.getElementById("baileysQrImg");
-            const qrLoad = document.getElementById("baileysQrLoading");
             if (qrImg) { qrImg.src = data.qr; qrImg.classList.remove("hidden"); }
             if (qrLoad) qrLoad.classList.add("hidden");
+            document.getElementById("waModalStateText").textContent = "Escanea el QR para vincular";
+            document.getElementById("waModalStateText").className = "text-[10px] font-bold text-amber-700";
+            if (modalBox) modalBox.className = "p-3.5 rounded-xl border border-amber-200 bg-amber-50/60 flex items-center justify-between";
+            if (modalDot) modalDot.className = "relative inline-flex rounded-full h-3 w-3 bg-amber-500";
             document.getElementById("baileysQrContainer").classList.remove("hidden");
           }
         }
       } catch (e) {
+        if (manual && qrLoad) {
+          qrLoad.textContent = "Reintentando conexión con wa.urenatax.com...";
+          qrLoad.classList.remove("hidden");
+        }
         console.log("Servicio Baileys en espera de iniciar en Namecheap:", e.message);
       }
     }
