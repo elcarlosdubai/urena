@@ -13,6 +13,10 @@ const {
   fetchLatestBaileysVersion
 } = require('@whiskeysockets/baileys');
 
+if (!globalThis.WebSocket) {
+  globalThis.WebSocket = require('ws');
+}
+
 const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
@@ -252,6 +256,32 @@ app.post('/logout', async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+// =========================================================================
+// MOTOR DE GOTEO DE CORREOS (DISPARA CADA 60s HACIA VERCEL)
+// =========================================================================
+const EMAIL_DRIP_URL = process.env.EMAIL_DRIP_URL || 'https://www.urenatax.com/api/process-email-drip';
+let isEmailDripTicking = false;
+
+async function triggerEmailDripOnce() {
+  if (isEmailDripTicking) return;
+  isEmailDripTicking = true;
+  try {
+    const res = await fetch(EMAIL_DRIP_URL, { signal: AbortSignal.timeout(15000) });
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.status === 'success' || data.status === 'completed') {
+        console.log('[Email Goteo]', data);
+      }
+    }
+  } catch (e) {
+    console.warn('[Email Goteo] Error llamando endpoint:', e.message);
+  } finally {
+    isEmailDripTicking = false;
+  }
+}
+
+setInterval(triggerEmailDripOnce, 60000);
 
 // Iniciar servidor y socket
 app.listen(PORT, () => {
