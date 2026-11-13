@@ -9,8 +9,9 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const { formType, lang, name, phone, email, service, date, time, message, notes, subject } = req.body || {};
+  const { formType, lang, noPromo, name, phone, email, service, date, time, message, notes, subject } = req.body || {};
   const isEn = String(lang || '').toLowerCase() === 'en';
+  const isNormalCita = Boolean(noPromo);
 
   // Configuración SMTP Oficial Ureña Tax (premium45.web-hosting.com:465)
   const transporter = nodemailer.createTransport({
@@ -125,15 +126,15 @@ module.exports = async function handler(req, res) {
                       Hola <strong>${name || 'Estimado(a) Cliente'}</strong> 👋
                     </p>
                     <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 22px;">
-                      Hemos reservado tu espacio en nuestro calendario para brindarte atención personalizada. A continuación tienes los detalles de tu cita y tu beneficio aplicado:
+                      Hemos reservado tu espacio en nuestro calendario para brindarte atención personalizada.${isNormalCita ? '' : ' A continuación tienes los detalles de tu cita y tu beneficio aplicado:'}
                     </p>
 
-                    <!-- BANNER DE DESCUENTO 10% -->
+                    ${isNormalCita ? '' : `<!-- BANNER DE DESCUENTO 10% -->
                     <div style="background-color: #ECFDF5; border: 2px dashed #28D070; border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 24px;">
                       <span style="display: block; color: #047857; font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">★ BENEFICIO DE TEMPORADA APLICADO ★</span>
                       <div style="color: #065F46; font-size: 26px; font-weight: 900; margin: 4px 0;">10% DE DESCUENTO</div>
                       <p style="color: #4B5563; font-size: 12px; margin: 0;">Presenta este correo o menciónalo al momento de tu cita presencial o virtual.</p>
-                    </div>
+                    </div>`}
 
                     <!-- TABLA DETALLES DEL TURNO -->
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; margin-bottom: 24px; font-size: 13px; background-color: #F9FAFB; border-radius: 12px; border: 1px solid #E5E7EB;">
@@ -204,8 +205,8 @@ module.exports = async function handler(req, res) {
           from: '"Ureña Tax & Accounting" <info@urenatax.com>',
           to: email,
           subject: isEn
-            ? '🗓️ Appointment Confirmation (10% OFF) - Ureña Tax & Accounting'
-            : '🗓️ Confirmación de Cita (10% Descuento) - Ureña Tax & Accounting',
+            ? (isNormalCita ? '🗓️ Appointment Confirmation - URENA TAX' : '🗓️ Appointment Confirmation (10% OFF) - URENA TAX')
+            : (isNormalCita ? '🗓️ Confirmación de Cita - URENA TAX' : '🗓️ Confirmación de Cita (10% Descuento) - URENA TAX'),
           html: isEn
             ? appointmentClientHtml
                 .replace('lang="es"', 'lang="en"')
@@ -230,7 +231,7 @@ module.exports = async function handler(req, res) {
     // Alerta Cita a la Oficina Oficial (info@urenatax.com)
     const appointmentAdminHtml = `
       <div style="font-family: sans-serif; padding: 20px; color: #1F2937; background: #FFFFFF; border-radius: 12px; border: 1px solid #E5E7EB; max-width: 550px;">
-        <h2 style="color: #28D070; margin-top: 0;">📅 Nueva Cita Agendada (Postcard 10% OFF)</h2>
+        <h2 style="color: #28D070; margin-top: 0;">📅 Nueva Cita Agendada (${isNormalCita ? 'Cita Web' : 'Postcard 10% OFF'})</h2>
         <p style="font-size: 13px; color: #6B7280;">Origen: Formulario Interactivo /cita/ • <strong>Idioma:</strong> ${isEn ? '🇺🇸 Inglés (EN)' : '🇪🇸 Español (ES)'}</p>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 15px 0;">
         <p><strong>Cliente:</strong> ${name || 'No indicado'}</p>
@@ -339,7 +340,7 @@ module.exports = async function handler(req, res) {
         transporter.sendMail({
           from: '"Ureña Tax & Accounting" <info@urenatax.com>',
           to: email,
-          subject: '✅ Consulta Recibida - Ureña Tax & Accounting Services',
+          subject: '✅ Consulta Recibida - URENA TAX',
           html: clientContactHtml
         })
       );

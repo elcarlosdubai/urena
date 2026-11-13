@@ -27,7 +27,23 @@
       "destination": "/admin/index.html"
     },
     {
-      "source": "/((?!api|assets|cita|admin|favicon.svg|robots.txt|sitemap.xml).*)",
+      "source": "/contact",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/services",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/services/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:path((?!api(?:/|$)|assets(?:/|$)|cita(?:/|$)|citas(?:/|$)|admin(?:/|$)|favicon\\.svg$|robots\\.txt$|sitemap\\.xml$).*)",
       "destination": "/index.html"
     }
   ],

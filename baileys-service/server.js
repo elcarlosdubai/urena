@@ -40,6 +40,25 @@ let qrCodeData = null;
 let connectionState = 'connecting'; // 'connecting', 'open', 'close', 'qr_ready'
 let connectedPhone = null;
 
+// Cache en memoria para reintentos Signal (evita "Waiting for this message. This may take a while")
+const sentMessagesCache = new Map();
+function cacheSentMessage(msg) {
+  if (!msg?.key?.id || !msg?.message) return;
+  sentMessagesCache.set(msg.key.id, msg.message);
+  if (sentMessagesCache.size > 500) {
+    const oldestKey = sentMessagesCache.keys().next().value;
+    sentMessagesCache.delete(oldestKey);
+  }
+}
+
+const retryMap = new Map();
+const msgRetryCounterCache = {
+  get: (key) => retryMap.get(key),
+  set: (key, val) => { retryMap.set(key, val); },
+  del: (key) => { retryMap.delete(key); },
+  flushAll: () => { retryMap.clear(); }
+};
+
 // Inicializador de Baileys
 async function startBaileys() {
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
@@ -50,8 +69,14 @@ async function startBaileys() {
     version,
     auth: state,
     logger: pino({ level: 'silent' }),
-    printQRInTerminal: true,
-    browser: ['Urena Tax Portal', 'Chrome', '1.0.0']
+    browser: ['Urena Tax Portal', 'Chrome', '1.0.0'],
+    syncFullHistory: false,
+    markOnlineOnConnect: false,
+    msgRetryCounterCache,
+    getMessage: async (key) => {
+      if (!key?.id) return undefined;
+      return sentMessagesCache.get(key.id);
+    }
   });
 
   sock.ev.on('creds.update', saveCreds);
@@ -111,7 +136,13 @@ async function sendWhatsAppMessage(phone, messageText) {
   if (connectionState !== 'open' || !sock) {
     throw new Error('WhatsApp no está conectado.');
   }
-  const jid = formatWhatsAppJid(phone);
+  let jid = formatWhatsAppJid(phone);
+  try {
+    const [check] = await sock.onWhatsApp(jid);
+    if (check?.exists && check?.jid) {
+      jid = check.jid;
+    }
+  } catch (_) {}
 
   try {
     await sock.sendPresenceUpdate('available', jid);
@@ -127,7 +158,9 @@ async function sendWhatsAppMessage(phone, messageText) {
     await sleep(randomBetween(300, 700));
   } catch (_) {}
 
-  return await sock.sendMessage(jid, { text: messageText });
+  const sent = await sock.sendMessage(jid, { text: messageText });
+  cacheSentMessage(sent);
+  return sent;
 }
 
 // =========================================================================

@@ -528,8 +528,8 @@
             phone: phone,
             email: email || "No indicado",
             service: service,
-            message: `[${langTag}] [Postcard QR] Fecha: ${date} a las ${time}. Nota: ${notes || "Sin notas"}`,
-            source: `Flyer QR [${langTag}]`,
+            message: `[${langTag}] [${isNormalAppointment ? "Cita Web" : "Postcard QR"}] Fecha: ${date} a las ${time}. Nota: ${notes || "Sin notas"}`,
+            source: `${isNormalAppointment ? "Cita Web" : "Flyer QR"} [${langTag}]`,
             status: "Nuevo"
           }]).then(res => console.log("Lead guardado en Supabase:", res));
 
@@ -539,7 +539,7 @@
             service: service,
             appointment_date: date,
             appointment_time: time,
-            notes: `[${langTag}] [Postcard 10% OFF] ${notes || "Cita generada desde tarjeta interactiva"}`,
+            notes: `[${langTag}] [${isNormalAppointment ? "Cita Web" : "Postcard 10% OFF"}] ${notes || "Cita generada desde tarjeta interactiva"}`,
             status: "Confirmada"
           }]).then(res => console.log("Cita guardada en Supabase:", res));
         }
@@ -594,11 +594,11 @@
 
         // 4. ENVIAR CORREO DE CONFIRMACIÓN AL INSTANTE Y REGISTRAR LOG
         const waText = currentCitaLang === "en"
-          ? `Hi ${name}! We received your appointment request at Ureña Tax for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly. Your 10% discount is locked in!`
-          : `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;
+          ? `Hi ${name}! We received your appointment request at Ureña Tax for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly.${isNormalAppointment ? "" : " Your 10% discount is locked in!"}`
+          : `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ.${isNormalAppointment ? "" : " ¡Tu 10% de descuento está asegurado!"}`;
         const emailSubject = currentCitaLang === "en"
-          ? `Appointment Confirmation (10% OFF) - Ureña Tax`
-          : `Confirmación de Cita (10% Descuento) - Ureña Tax`;
+          ? (isNormalAppointment ? `Appointment Confirmation - URENA TAX` : `Appointment Confirmation (10% OFF) - URENA TAX`)
+          : (isNormalAppointment ? `Confirmación de Cita - URENA TAX` : `Confirmación de Cita (10% Descuento) - URENA TAX`);
 
         (async () => {
           let emailStatus = "Enviado";
@@ -610,6 +610,7 @@
               body: JSON.stringify({
                 formType: "appointment",
                 lang: currentCitaLang,
+                noPromo: isNormalAppointment,
                 name,
                 phone,
                 email,
@@ -762,6 +763,7 @@
       }
     };
 
+    const isNormalAppointment = new URLSearchParams(window.location.search).get("tipo") === "normal";
     let currentCitaLang = localStorage.getItem("urena_cita_lang") === "en" ? "en" : "es";
 
     function applyCitaLanguage(lang) {
@@ -769,7 +771,29 @@
       try { localStorage.setItem("urena_cita_lang", currentCitaLang); } catch (e) {}
       document.documentElement.lang = currentCitaLang;
 
-      const dict = CITA_I18N[currentCitaLang];
+      const baseDict = CITA_I18N[currentCitaLang] || CITA_I18N.es;
+      const dict = isNormalAppointment
+        ? {
+            ...baseDict,
+            ...(currentCitaLang === "en"
+              ? {
+                  autoDiscount: "Online Booking",
+                  benefitTag: "★ RESERVE YOUR SPOT ★",
+                  discountTitle: "BOOK APPOINTMENT",
+                  discountDesc: "Schedule your personal or business tax consultation at our Paterson, NJ office or virtually.",
+                  backSub: "Instant Confirmation",
+                  btnSubmit: "Confirm Appointment"
+                }
+              : {
+                  autoDiscount: "Cita Online",
+                  benefitTag: "★ RESERVA TU ESPACIO ★",
+                  discountTitle: "AGENDA TU CITA",
+                  discountDesc: "Agenda tu consulta personal o de negocio en nuestra oficina de Paterson, NJ o en modalidad virtual.",
+                  backSub: "Confirmación Inmediata",
+                  btnSubmit: "Confirmar Cita"
+                })
+          }
+        : baseDict;
       document.querySelectorAll("[data-i18n]").forEach(el => {
         const key = el.getAttribute("data-i18n");
         if (dict[key]) el.textContent = dict[key];
