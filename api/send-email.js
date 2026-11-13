@@ -229,6 +229,7 @@ module.exports = async function handler(req, res) {
       transporter.sendMail({
         from: '"Alerta Cita Ureña" <info@urenatax.com>',
         to: 'info@urenatax.com',
+        cc: 'Contact@urenataxsolutions.com',
         subject: `📅 Nueva Cita Agendada: ${name || 'Cliente'} (${date || ''} ${time || ''})`,
         html: appointmentAdminHtml
       })
@@ -332,6 +333,7 @@ module.exports = async function handler(req, res) {
         <p style="font-size: 13px; color: #6B7280;">Origen: Formulario de Contacto Web</p>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 15px 0;">
         <p><strong>Remitente:</strong> ${name || 'No indicado'}</p>
+        <p><strong>Teléfono / WhatsApp:</strong> <a href="tel:${phone || ''}">${phone || 'No indicado'}</a></p>
         <p><strong>Correo:</strong> <a href="mailto:${email}">${email}</a></p>
         <p><strong>Mensaje:</strong></p>
         <div style="background: #F9FAFB; padding: 12px; border-radius: 8px; border: 1px solid #E5E7EB; font-style: italic;">"${message || 'Sin mensaje'}"</div>
@@ -343,6 +345,7 @@ module.exports = async function handler(req, res) {
       transporter.sendMail({
         from: '"Alerta Web Ureña" <info@urenatax.com>',
         to: 'info@urenatax.com',
+        cc: 'Contact@urenataxsolutions.com',
         subject: `📩 Nuevo Mensaje Web de: ${name || 'Usuario'}`,
         html: adminContactHtml
       })
