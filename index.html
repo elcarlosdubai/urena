@@ -880,13 +880,14 @@
         });
       }
 
-      // Mostrar pop-up automáticamente tras cargar la página
-      setTimeout(function() {
-        // Solo abrir si no ha sido cerrado previamente en la sesión
-        if (!sessionStorage.getItem("promo_closed")) {
-          window.openPromoModal();
-        }
-      }, 1000);
+      // Mostrar pop-up después de que la portada principal haya cargado por completo (protege LCP y UX)
+      window.addEventListener("load", function() {
+        setTimeout(function() {
+          if (!sessionStorage.getItem("promo_closed")) {
+            window.openPromoModal();
+          }
+        }, 2500);
+      });
 
       // Guardar cuando el usuario cierra para no ser invasivo
       var originalClose = window.closePromoModal;
