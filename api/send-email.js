@@ -48,8 +48,8 @@ module.exports = async function handler(req, res) {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #FFFFFF; border-radius: 20px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
                 <tr>
                   <td style="background-color: #FFFFFF; padding: 28px 24px 20px 24px; text-align: center; border-bottom: 4px solid #28D070;">
-                    <img src="${LOGO_URL}" alt="Ureña Tax & Accounting" width="190" style="display: block; margin: 0 auto 12px auto; max-width: 190px; height: auto;">
-                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 20px; font-weight: 900;">${subject || 'Comunicado Ureña Tax & Accounting'}</h1>
+                    <img src="${LOGO_URL}" alt="URENA TAX" width="190" style="display: block; margin: 0 auto 12px auto; max-width: 190px; height: auto;">
+                    <h1 style="margin: 6px 0 0; color: #111827; font-size: 20px; font-weight: 900;">${subject || 'Comunicado URENA TAX'}</h1>
                   </td>
                 </tr>
                 <tr>
@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
                       ${message || ''}
                     </div>
                     <div style="background-color: #111827; color: #FFFFFF; border-radius: 14px; padding: 18px; text-align: center; font-size: 12px; line-height: 1.5;">
-                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal Ureña Tax</p>
+                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal URENA TAX</p>
                       <p style="margin: 0 0 6px; color: #9CA3AF;">8 Clark St, Paterson, NJ 07505</p>
                       <p style="margin: 0;">Línea Directa / WhatsApp: <strong style="color: #28D070;">(551) 232-1994</strong></p>
                     </div>
@@ -69,7 +69,7 @@ module.exports = async function handler(req, res) {
                 </tr>
                 <tr>
                   <td style="background-color: #F9FAFB; padding: 18px; text-align: center; font-size: 11px; color: #9CA3AF; border-top: 1px solid #E5E7EB;">
-                    © 2026 Urena Tax & Accounting Solutions LLC • Paterson, NJ
+                    © 2026 URENA TAX • Paterson, NJ
                   </td>
                 </tr>
               </table>
@@ -81,9 +81,9 @@ module.exports = async function handler(req, res) {
 
     promises.push(
       transporter.sendMail({
-        from: '"Ureña Tax & Accounting" <info@urenatax.com>',
+        from: '"URENA TAX" <info@urenatax.com>',
         to: email,
-        subject: subject || 'Información importante - Ureña Tax & Accounting',
+        subject: subject || 'Información importante - URENA TAX',
         html: customHtml
       })
     );
@@ -99,7 +99,7 @@ module.exports = async function handler(req, res) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Confirmación de Cita | Ureña Tax & Accounting</title>
+        <title>Confirmación de Cita | URENA TAX</title>
       </head>
       <body style="margin: 0; padding: 0; background-color: #F4F5F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F4F5F6; padding: 30px 10px;">
@@ -110,7 +110,7 @@ module.exports = async function handler(req, res) {
                 <!-- CABECERA BLANCA LIMPIA CON LOGO REAL PNG -->
                 <tr>
                   <td style="background-color: #FFFFFF; padding: 28px 24px 20px 24px; text-align: center; border-bottom: 4px solid #28D070;">
-                    <img src="${LOGO_URL}" alt="Ureña Tax & Accounting" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
+                    <img src="${LOGO_URL}" alt="URENA TAX" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
                     <div style="display: inline-block; background-color: #ECFDF5; color: #047857; font-size: 11px; font-weight: 800; padding: 5px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.8px; border: 1px solid #A7F3D0; margin-bottom: 8px;">
                       ✓ Cita Confirmada
                     </div>
@@ -179,7 +179,7 @@ module.exports = async function handler(req, res) {
 
                     <!-- OFICINA NEGRA -->
                     <div style="background-color: #111827; color: #FFFFFF; border-radius: 14px; padding: 18px; text-align: center; font-size: 12px; line-height: 1.5;">
-                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal Ureña Tax</p>
+                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal URENA TAX</p>
                       <p style="margin: 0 0 6px; color: #9CA3AF;">8 Clark St, Paterson, NJ 07505</p>
                       <p style="margin: 0;">Línea Directa / WhatsApp: <strong style="color: #28D070;">(551) 232-1994</strong></p>
                     </div>
@@ -189,7 +189,7 @@ module.exports = async function handler(req, res) {
                 <!-- FOOTER LEGAL -->
                 <tr>
                   <td style="background-color: #F9FAFB; padding: 18px; text-align: center; font-size: 11px; color: #9CA3AF; border-top: 1px solid #E5E7EB; line-height: 1.5;">
-                    © 2026 Urena Tax & Accounting Solutions LLC • Paterson, NJ<br>
+                    © 2026 URENA TAX • Paterson, NJ<br>
                     IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados
                   </td>
                 </tr>
@@ -202,7 +202,7 @@ module.exports = async function handler(req, res) {
 
       promises.push(
         transporter.sendMail({
-          from: '"Ureña Tax & Accounting" <info@urenatax.com>',
+          from: '"URENA TAX" <info@urenatax.com>',
           to: email,
           subject: isEn
             ? (isNormalCita ? '🗓️ Appointment Confirmation - URENA TAX' : '🗓️ Appointment Confirmation (10% OFF) - URENA TAX')
@@ -210,18 +210,18 @@ module.exports = async function handler(req, res) {
           html: isEn
             ? appointmentClientHtml
                 .replace('lang="es"', 'lang="en"')
-                .replace('Cita Confirmada | Ureña Tax & Accounting', 'Appointment Confirmed | Ureña Tax & Accounting')
+                .replace('Cita Confirmada | URENA TAX', 'Appointment Confirmed | URENA TAX')
                 .replace('¡Tu Cita ha sido Agendada!', 'Your Appointment is Confirmed!')
                 .replace('Confirmación Oficial • Paterson, New Jersey', 'Official Confirmation • Paterson, New Jersey')
                 .replace('Hola <strong>', 'Hi <strong>')
                 .replace('Estimado(a) Cliente', 'Valued Client')
-                .replace('Gracias por agendar con <strong>Ureña Tax & Accounting Services</strong>. Tu espacio ha sido reservado con tu <strong style="color: #047857;">10% de Descuento</strong> automático.', 'Thank you for booking with <strong>Ureña Tax & Accounting Services</strong>. Your spot is reserved with your automatic <strong style="color: #047857;">10% OFF</strong>.')
+                .replace('Gracias por agendar con <strong>URENA TAX</strong>. Tu espacio ha sido reservado con tu <strong style="color: #047857;">10% de Descuento</strong> automático.', 'Thank you for booking with <strong>URENA TAX</strong>. Your spot is reserved with your automatic <strong style="color: #047857;">10% OFF</strong>.')
                 .replace('Servicio Solicitado:', 'Service:')
                 .replace('Fecha y Hora:', 'Date & Time:')
                 .replace('Beneficio:', 'Benefit:')
                 .replace('10% de Descuento Aplicado', '10% Discount Applied')
                 .replace('Reagendar o Consultar por WhatsApp ➔', 'Reschedule or Message Us on WhatsApp ➔')
-                .replace('Oficina Principal Ureña Tax', 'Ureña Tax Main Office')
+                .replace('Oficina Principal URENA TAX', 'URENA TAX Main Office')
                 .replace('Línea Directa / WhatsApp:', 'Direct Line / WhatsApp:')
             : appointmentClientHtml
         })
@@ -247,7 +247,7 @@ module.exports = async function handler(req, res) {
 
     promises.push(
       transporter.sendMail({
-        from: '"Alerta Cita Ureña" <info@urenatax.com>',
+        from: '"Alerta Cita URENA TAX" <info@urenatax.com>',
         to: 'info@urenatax.com',
         cc: 'Contact@urenataxsolutions.com',
         subject: `📅 Nueva Cita Agendada: ${name || 'Cliente'} (${date || ''} ${time || ''})`,
@@ -266,7 +266,7 @@ module.exports = async function handler(req, res) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Mensaje Recibido | Ureña Tax & Accounting</title>
+        <title>Mensaje Recibido | URENA TAX</title>
       </head>
       <body style="margin: 0; padding: 0; background-color: #F4F5F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1F2937;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F4F5F6; padding: 30px 10px;">
@@ -277,7 +277,7 @@ module.exports = async function handler(req, res) {
                 <!-- CABECERA BLANCA LIMPIA CON LOGO REAL PNG -->
                 <tr>
                   <td style="background-color: #FFFFFF; padding: 28px 24px 20px 24px; text-align: center; border-bottom: 4px solid #28D070;">
-                    <img src="${LOGO_URL}" alt="Ureña Tax & Accounting" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
+                    <img src="${LOGO_URL}" alt="URENA TAX" width="190" style="display: block; margin: 0 auto 16px auto; max-width: 190px; height: auto;">
                     <h1 style="margin: 6px 0 0; color: #111827; font-size: 22px; font-weight: 900; letter-spacing: -0.5px;">¡Hemos Recibido tu Consulta!</h1>
                     <p style="margin: 4px 0 0; color: #6B7280; font-size: 13px; font-weight: 500;">Atención al Cliente • Paterson, New Jersey</p>
                   </td>
@@ -290,7 +290,7 @@ module.exports = async function handler(req, res) {
                       Hola <strong>${name || 'Estimado(a) Cliente'}</strong> 👋
                     </p>
                     <p style="font-size: 14px; color: #4B5563; line-height: 1.6; margin-bottom: 22px;">
-                      Gracias por escribir a <strong>Ureña Tax & Accounting Services</strong>. Hemos recibido tu mensaje correctamente y uno de nuestros asesores se comunicará contigo a la brevedad posible.
+                      Gracias por escribir a <strong>URENA TAX</strong>. Hemos recibido tu mensaje correctamente y uno de nuestros asesores se comunicará contigo a la brevedad posible.
                     </p>
 
                     <!-- RESUMEN DE SU CONSULTA -->
@@ -315,7 +315,7 @@ module.exports = async function handler(req, res) {
 
                     <!-- OFICINA NEGRA -->
                     <div style="background-color: #111827; color: #FFFFFF; border-radius: 14px; padding: 18px; text-align: center; font-size: 12px; line-height: 1.5;">
-                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal Ureña Tax</p>
+                      <p style="margin: 0 0 4px; font-weight: 800; font-size: 13px; color: #FFFFFF;">📍 Oficina Principal URENA TAX</p>
                       <p style="margin: 0 0 6px; color: #9CA3AF;">8 Clark St, Paterson, NJ 07505</p>
                       <p style="margin: 0;">Línea Directa / WhatsApp: <strong style="color: #28D070;">(551) 232-1994</strong></p>
                     </div>
@@ -325,7 +325,7 @@ module.exports = async function handler(req, res) {
                 <!-- FOOTER LEGAL -->
                 <tr>
                   <td style="background-color: #F9FAFB; padding: 18px; text-align: center; font-size: 11px; color: #9CA3AF; border-top: 1px solid #E5E7EB; line-height: 1.5;">
-                    © 2026 Urena Tax & Accounting Solutions LLC • Paterson, NJ<br>
+                    © 2026 URENA TAX • Paterson, NJ<br>
                     IRS Certified Acceptance Agent (CAA) • Servicios Contables y Tributarios Certificados
                   </td>
                 </tr>
@@ -338,7 +338,7 @@ module.exports = async function handler(req, res) {
 
       promises.push(
         transporter.sendMail({
-          from: '"Ureña Tax & Accounting" <info@urenatax.com>',
+          from: '"URENA TAX" <info@urenatax.com>',
           to: email,
           subject: '✅ Consulta Recibida - URENA TAX',
           html: clientContactHtml
@@ -358,12 +358,12 @@ module.exports = async function handler(req, res) {
         <p><strong>Mensaje:</strong></p>
         <div style="background: #F9FAFB; padding: 12px; border-radius: 8px; border: 1px solid #E5E7EB; font-style: italic;">"${message || 'Sin mensaje'}"</div>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 15px 0;">
-        <a href="mailto:${email}?subject=Respuesta%20Ureña%20Tax" style="display: inline-block; background: #28D070; color: #000; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">Responder al Cliente por Correo ➔</a>
+        <a href="mailto:${email}?subject=Respuesta%20URENA%20TAX" style="display: inline-block; background: #28D070; color: #000; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">Responder al Cliente por Correo ➔</a>
       </div>`;
 
     promises.push(
       transporter.sendMail({
-        from: '"Alerta Web Ureña" <info@urenatax.com>',
+        from: '"Alerta Web URENA TAX" <info@urenatax.com>',
         to: 'info@urenatax.com',
         cc: 'Contact@urenataxsolutions.com',
         subject: `📩 Nuevo Mensaje Web de: ${name || 'Usuario'}`,

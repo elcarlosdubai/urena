@@ -39,6 +39,16 @@ let sock = null;
 let qrCodeData = null;
 let connectionState = 'connecting'; // 'connecting', 'open', 'close', 'qr_ready'
 let connectedPhone = null;
+let isStartingBaileys = false;
+let reconnectTimer = null;
+
+function scheduleBaileysRestart(delayMs) {
+  if (reconnectTimer) clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    startBaileys();
+  }, delayMs);
+}
 
 // Cache en memoria para reintentos Signal (evita "Waiting for this message. This may take a while")
 const sentMessagesCache = new Map();
@@ -59,61 +69,73 @@ const msgRetryCounterCache = {
   flushAll: () => { retryMap.clear(); }
 };
 
-// Inicializador de Baileys
+// Inicializador de Baileys (con bloqueo para evitar 2 sockets peleando por auth_info_baileys)
 async function startBaileys() {
-  const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
-  const { version, isLatest } = await fetchLatestBaileysVersion();
-  console.log(`[Baileys] Usando WhatsApp Web v${version.join('.')}, isLatest: ${isLatest}`);
-
-  sock = makeWASocket({
-    version,
-    auth: state,
-    logger: pino({ level: 'silent' }),
-    browser: ['Urena Tax Portal', 'Chrome', '1.0.0'],
-    syncFullHistory: false,
-    markOnlineOnConnect: false,
-    msgRetryCounterCache,
-    getMessage: async (key) => {
-      if (!key?.id) return undefined;
-      return sentMessagesCache.get(key.id);
-    }
-  });
-
-  sock.ev.on('creds.update', saveCreds);
-
-  sock.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect, qr } = update;
-
-    if (qr) {
-      connectionState = 'qr_ready';
-      qrCodeData = await qrcode.toDataURL(qr);
-      console.log('[Baileys] Nuevo código QR generado. Escanéalo desde el portal o terminal.');
+  if (isStartingBaileys) return;
+  isStartingBaileys = true;
+  try {
+    if (sock) {
+      try { sock.ev.removeAllListeners(); } catch (_) {}
+      try { sock.end(undefined); } catch (_) {}
+      sock = null;
     }
 
-    if (connection === 'close') {
-      const statusCode = (lastDisconnect?.error)?.output?.statusCode;
-      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-      connectionState = 'close';
-      qrCodeData = null;
-      connectedPhone = null;
-      console.log(`[Baileys] Conexión cerrada. Razón: ${statusCode}. Reconectando: ${shouldReconnect}`);
-      if (shouldReconnect) {
-        setTimeout(startBaileys, 5000);
-      } else {
-        console.log('[Baileys] Sesión cerrada permanentemente. Limpiando credenciales...');
-        if (fs.existsSync(AUTH_FOLDER)) {
-          fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
-        }
-        setTimeout(startBaileys, 3000);
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+    console.log(`[Baileys] Usando WhatsApp Web v${version.join('.')}, isLatest: ${isLatest}`);
+
+    sock = makeWASocket({
+      version,
+      auth: state,
+      logger: pino({ level: 'silent' }),
+      browser: ['Urena Tax Portal', 'Chrome', '1.0.0'],
+      syncFullHistory: false,
+      markOnlineOnConnect: false,
+      msgRetryCounterCache,
+      getMessage: async (key) => {
+        if (!key?.id) return undefined;
+        return sentMessagesCache.get(key.id);
       }
-    } else if (connection === 'open') {
-      connectionState = 'open';
-      qrCodeData = null;
-      connectedPhone = sock.user?.id ? sock.user.id.split(':')[0] : '5512321994';
-      console.log(`[Baileys] ¡WhatsApp CONECTADO exitosamente! Número: ${connectedPhone}`);
-      startQueueWorker();
-    }
-  });
+    });
+
+    sock.ev.on('creds.update', saveCreds);
+
+    sock.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect, qr } = update;
+
+      if (qr) {
+        connectionState = 'qr_ready';
+        qrCodeData = await qrcode.toDataURL(qr);
+        console.log('[Baileys] Nuevo código QR generado. Escanéalo desde el portal o terminal.');
+      }
+
+      if (connection === 'close') {
+        const statusCode = (lastDisconnect?.error)?.output?.statusCode;
+        const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+        connectionState = 'close';
+        qrCodeData = null;
+        connectedPhone = null;
+        console.log(`[Baileys] Conexión cerrada. Razón: ${statusCode}. Reconectando: ${shouldReconnect}`);
+        if (shouldReconnect) {
+          scheduleBaileysRestart(5000);
+        } else {
+          console.log('[Baileys] Sesión cerrada permanentemente. Limpiando credenciales...');
+          if (fs.existsSync(AUTH_FOLDER)) {
+            fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
+          }
+          scheduleBaileysRestart(3000);
+        }
+      } else if (connection === 'open') {
+        connectionState = 'open';
+        qrCodeData = null;
+        connectedPhone = sock.user?.id ? sock.user.id.split(':')[0] : '5512321994';
+        console.log(`[Baileys] ¡WhatsApp CONECTADO exitosamente! Número: ${connectedPhone}`);
+        startQueueWorker();
+      }
+    });
+  } finally {
+    isStartingBaileys = false;
+  }
 }
 
 // Formateador de Teléfono Internacional (+1 para USA / Paterson)
@@ -314,15 +336,20 @@ app.post('/send-message', async (req, res) => {
 app.post('/logout', async (req, res) => {
   try {
     if (sock) {
-      await sock.logout();
+      try { sock.ev.removeAllListeners(); } catch (_) {}
+      await sock.logout().catch(() => {});
+      try { sock.end(undefined); } catch (_) {}
+      sock = null;
     }
     if (fs.existsSync(AUTH_FOLDER)) {
       fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
     }
+    sentMessagesCache.clear();
+    retryMap.clear();
     connectionState = 'close';
     qrCodeData = null;
     connectedPhone = null;
-    setTimeout(startBaileys, 2000);
+    scheduleBaileysRestart(2000);
     return res.json({ success: true, message: 'Sesión cerrada. Escanea un nuevo QR.' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
