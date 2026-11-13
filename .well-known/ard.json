@@ -1,33 +1,37 @@
 {
-  "schema_version": "1.0",
-  "name": "URENA TAX",
-  "description": "Preparación de taxes personales y de negocio, ITIN (IRS CAA), contabilidad, payroll y notaría pública en Paterson, NJ y virtual.",
-  "url": "https://www.urenatax.com",
-  "contact": {
-    "phone": "+1-551-232-1994",
-    "email": "contact@urenataxsolutions.com",
-    "address": "8 Clark St, Paterson, NJ 07505, US"
-  },
-  "resources": [
+  "entries": [
     {
-      "name": "Inicio",
-      "url": "https://www.urenatax.com/",
-      "type": "webpage"
-    },
-    {
-      "name": "Agendar Cita",
+      "identifier": "urn:air:urenatax.com:web:appointment-booking",
+      "displayName": "URENA TAX Appointment Booking",
+      "type": "text/html",
       "url": "https://www.urenatax.com/cita?tipo=normal",
-      "type": "booking"
+      "description": "Online appointment booking for tax preparation, ITIN, payroll, and notary services at URENA TAX in Paterson, NJ.",
+      "representativeQueries": [
+        "agendar cita en URENA TAX",
+        "book tax appointment in Paterson NJ"
+      ]
     },
     {
-      "name": "Contacto",
+      "identifier": "urn:air:urenatax.com:web:contact",
+      "displayName": "URENA TAX Contact",
+      "type": "text/html",
       "url": "https://www.urenatax.com/contact",
-      "type": "contact"
+      "description": "Direct contact form, phone number, and office details for URENA TAX in Paterson, NJ.",
+      "representativeQueries": [
+        "contactar a URENA TAX",
+        "URENA TAX phone number and address"
+      ]
     },
     {
-      "name": "LLMs Guide",
+      "identifier": "urn:air:urenatax.com:docs:llms",
+      "displayName": "URENA TAX LLMs Guide",
+      "type": "text/markdown",
       "url": "https://www.urenatax.com/llms.txt",
-      "type": "documentation"
+      "description": "Markdown overview of URENA TAX services and key links.",
+      "representativeQueries": [
+        "what services does URENA TAX offer",
+        "URENA TAX services overview"
+      ]
     }
   ]
 }
