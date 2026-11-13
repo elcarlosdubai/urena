@@ -1690,25 +1690,118 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
       document.getElementById("phoneMessagePreview").textContent = text;
     };
 
-    window.startWaDrip = function() {
-      alert("Iniciando Sistema de Goteo: Se enviarán 5 mensajes cada 45 segundos para proteger la línea contra bloqueos de WhatsApp.");
+    window.startWaDrip = async function() {
+      const text = (document.getElementById("waTextEditor").value || "").trim();
+      if (!text) {
+        alert("Por favor escribe un mensaje para la campaña de WhatsApp.");
+        return;
+      }
+
+      const leads = typeof getLeads === "function" ? getLeads() : [];
+      const students = typeof getCourseStudents === "function" ? getCourseStudents() : [];
+      const phoneMap = new Map();
+
+      [...leads, ...students].forEach(item => {
+        const clean = String(item.phone || item.telefono || "").replace(/\D/g, "");
+        if (clean.length >= 7 && !phoneMap.has(clean)) {
+          phoneMap.set(clean, { phone: clean, name: item.name || "Estimado(a) Cliente" });
+        }
+      });
+
+      const recipientsList = Array.from(phoneMap.values());
+      if (recipientsList.length === 0) {
+        alert("No hay clientes o estudiantes con número de WhatsApp válido en el sistema.");
+        return;
+      }
+
+      if (!window.supabaseClient) {
+        alert("Error: Supabase no está inicializado.");
+        return;
+      }
+
+      try {
+        const { data: campData, error: campErr } = await window.supabaseClient
+          .from("email_campaigns")
+          .insert([{
+            name: "Difusión WhatsApp",
+            subject: "[WHATSAPP] Campaña Masiva",
+            content: text,
+            total_recipients: recipientsList.length,
+            sent_count: 0,
+            interval_seconds: 40,
+            status: "WA En Progreso"
+          }])
+          .select();
+
+        if (campErr || !campData || campData.length === 0) {
+          throw new Error(campErr?.message || "No se pudo crear la campaña en Supabase");
+        }
+
+        const queueItems = recipientsList.map(r => ({
+          campaign_id: campData[0].id,
+          recipient_email: `wa:${r.phone}`,
+          recipient_name: r.name,
+          status: "Pendiente"
+        }));
+
+        const { error: qErr } = await window.supabaseClient.from("email_queue").insert(queueItems);
+        if (qErr) throw new Error(qErr.message);
+
+        alert(`✅ Campaña de WhatsApp iniciada en la nube para ${recipientsList.length} destinatarios.\n\nPuedes cerrar el navegador; el servidor enviará los mensajes automáticamente con pausas anti-ban.`);
+      } catch (e) {
+        alert("❌ Error iniciando campaña WhatsApp: " + (e.message || e));
+      }
     };
 
-    window.sendWaTest = function() {
-      const num = prompt("Ingresa tu número de WhatsApp para recibir la prueba (Ej: +15512321994 o 5512321994):", "+15512321994");
+    window.sendWaTest = async function() {
+      const num = prompt("Ingresa tu número de WhatsApp para recibir la prueba (Ej: 15512321994):", "");
       if (!num) return;
-      let text = document.getElementById("waTextEditor").value;
-      text = text.replace(/{nombre}/g, "Carlos (Prueba)").replace(/{servicio}/g, "Taxes 2026");
       const clean = num.replace(/\D/g, "");
-      const url = "https://wa.me/" + clean + "?text=" + encodeURIComponent(text);
-      window.open(url, '_blank');
+      if (clean.length < 7) {
+        alert("Número inválido.");
+        return;
+      }
+      let text = document.getElementById("waTextEditor").value;
+      text = text.replace(/{nombre}/g, "Prueba").replace(/{servicio}/g, "Taxes 2026");
+      const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
+      try {
+        const res = await fetch(`${baileysUrl}/send-message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: clean, message: text }),
+          signal: AbortSignal.timeout(10000)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+        alert("✅ Mensaje de WhatsApp de prueba enviado a +" + clean);
+      } catch (err) {
+        alert("❌ No se pudo enviar la prueba por API (" + err.message + ").");
+      }
     };
 
-    window.sendEmailTest = function() {
-      const email = prompt("Ingresa el correo al que deseas enviar la prueba:", "admin@urenatax.com");
-      if (!email) return;
-      const subj = document.getElementById("emailSubject").value;
-      alert("✅ Correo de prueba enviado con éxito a: " + email + "\n\nAsunto: " + subj + "\n\nFormato HTML/Texto verificado.");
+    window.sendEmailTest = async function() {
+      const email = prompt("Ingresa el correo al que deseas enviar la prueba:", "");
+      if (!email || !email.includes("@")) return;
+      const subj = document.getElementById("emailSubject").value.trim() || "Prueba Ureña Tax";
+      const body = document.getElementById("emailBody").value.trim() || "Correo de prueba.";
+      try {
+        const res = await fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            formType: "custom",
+            to: email.trim(),
+            name: "Prueba",
+            subject: subj,
+            message: body.replace(/{nombre}/g, "Prueba").replace(/{email}/g, email.trim())
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
+        alert("✅ Correo de prueba enviado con éxito a: " + email);
+      } catch (err) {
+        alert("❌ Error enviando correo de prueba: " + err.message);
+      }
     };
 
     window.startEmailDrip = async function() {
@@ -3004,6 +3097,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
 
     document.addEventListener("DOMContentLoaded", () => {
       checkBaileysServerStatus();
+      setInterval(checkBaileysServerStatus, 5000);
     });
 
   </script>

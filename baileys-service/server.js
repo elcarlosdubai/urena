@@ -153,36 +153,75 @@ async function processQueueOnce() {
 
   isProcessingBatch = true;
   try {
+    const { data: campaigns, error: campErr } = await supabase
+      .from('email_campaigns')
+      .select('*')
+      .eq('status', 'WA En Progreso')
+      .limit(1);
+
+    if (campErr || !campaigns || campaigns.length === 0) return;
+    const campaign = campaigns[0];
+
     const { data: pending, error } = await supabase
       .from('email_queue')
       .select('*')
+      .eq('campaign_id', campaign.id)
       .eq('status', 'Pendiente')
       .limit(5);
 
-    if (error || !pending || pending.length === 0) return;
+    if (error) return;
+    if (!pending || pending.length === 0) {
+      await supabase
+        .from('email_campaigns')
+        .update({ status: 'Completado', updated_at: new Date().toISOString() })
+        .eq('id', campaign.id);
+      return;
+    }
+
+    let sentOk = Number(campaign.sent_count || 0);
+    let failedCount = Number(campaign.failed_count || 0);
 
     for (const item of pending) {
       if (connectionState !== 'open') break;
-      const dest = item.phone || item.contact;
-      const msg = item.body || item.message;
-      if (!dest || !msg) continue;
+      const rawDest = String(item.recipient_email || '').replace(/^wa:/i, '');
+      const dest = rawDest.replace(/\D/g, '');
+      const template = String(campaign.content || '');
+      if (dest.length < 7 || !template.trim()) {
+        await supabase
+          .from('email_queue')
+          .update({ status: 'Fallido', error_message: 'Número o mensaje inválido' })
+          .eq('id', item.id);
+        failedCount++;
+        continue;
+      }
+
+      const msg = template
+        .replace(/{nombre}/g, item.recipient_name || 'Estimado(a) Cliente')
+        .replace(/{telefono}/g, dest);
 
       console.log(`[WhatsApp Goteo] Escribiendo a ${dest}...`);
       try {
         await sendWhatsAppMessage(dest, msg);
         await supabase
           .from('email_queue')
-          .update({ status: 'Enviado', updated_at: new Date().toISOString() })
+          .update({ status: 'Enviado', sent_at: new Date().toISOString() })
           .eq('id', item.id);
+        sentOk++;
         sentInCurrentBlock++;
         console.log(`[WhatsApp Goteo] ✅ Enviado a ${dest} (Bloque: ${sentInCurrentBlock}/25)`);
       } catch (err) {
         console.error(`[WhatsApp Goteo] ❌ Error a ${dest}:`, err.message);
         await supabase
           .from('email_queue')
-          .update({ status: 'Fallido', error_message: err.message, updated_at: new Date().toISOString() })
+          .update({ status: 'Fallido', error_message: err.message })
           .eq('id', item.id);
+        failedCount++;
       }
+
+      await supabase
+        .from('email_campaigns')
+        .update({ sent_count: sentOk, failed_count: failedCount, updated_at: new Date().toISOString() })
+        .eq('id', campaign.id);
 
       // Pausa larga de enfriamiento cada 25 mensajes (4 a 7 minutos)
       if (sentInCurrentBlock >= 25) {

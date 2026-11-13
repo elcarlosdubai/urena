@@ -659,15 +659,33 @@
           }
 
           if (window.supabaseClient) {
-            window.supabaseClient.from("email_queue").insert([
-              {
-                email: email,
-                recipient: name,
-                subject: emailSubject,
-                body: `Cita agendada para ${service} el ${date} a las ${time}`,
-                status: emailStatus
+            const cleanWaPhone = String(phone || "").replace(/\D/g, "");
+            if (cleanWaPhone.length >= 7) {
+              try {
+                const { data: waCamp, error: waCampErr } = await window.supabaseClient
+                  .from("email_campaigns")
+                  .insert([{
+                    name: `Cita WhatsApp - ${name}`,
+                    subject: "[WHATSAPP] Confirmación de Cita",
+                    content: waText,
+                    total_recipients: 1,
+                    sent_count: 0,
+                    interval_seconds: 30,
+                    status: "WA En Progreso"
+                  }])
+                  .select();
+                if (!waCampErr && waCamp && waCamp.length > 0) {
+                  await window.supabaseClient.from("email_queue").insert([{
+                    campaign_id: waCamp[0].id,
+                    recipient_email: `wa:${cleanWaPhone}`,
+                    recipient_name: name,
+                    status: "Pendiente"
+                  }]);
+                }
+              } catch (e) {
+                console.warn("Error encolando WhatsApp en Supabase:", e);
               }
-            ]).then(r => console.log("Log email en Supabase:", r));
+            }
           }
         })();
       }, 700);
