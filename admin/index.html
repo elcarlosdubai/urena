@@ -457,7 +457,7 @@
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
-            <button onclick="renderUnifiedQueue()" class="py-2 px-3.5 bg-gray-100 hover:bg-gray-200 text-[#59595B] font-bold rounded-xl text-xs flex items-center gap-2 transition-colors">
+            <button onclick="syncUnifiedQueueFromSupabase()" class="py-2 px-3.5 bg-gray-100 hover:bg-gray-200 text-[#59595B] font-bold rounded-xl text-xs flex items-center gap-2 transition-colors">
               <i class="fa-solid fa-arrows-rotate"></i> Refrescar
             </button>
             <button onclick="processQueueAll()" class="py-2.5 px-4 bg-[#28D070] hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 shadow-sm transition-all transform hover:-translate-y-0.5">
@@ -2673,62 +2673,71 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     let queueCurrentPage = 1;
     let queuePageSize = 10;
 
-    function getUnifiedQueue() {
-      const defaultQueue = [
-        {
-          id: "q-1",
-          channel: "whatsapp",
-          recipient: "Carlos Mendoza",
-          contact: "201-873-8737",
-          subject: "Confirmación de Cita",
-          message: "Hola Carlos! Recibimos tu cita en Ureña Tax para Taxes el día 13 Nov a las 09:00 AM. Tu 10% de descuento está asegurado.",
-          status: "Pendiente",
-          created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString()
-        },
-        {
-          id: "q-2",
-          channel: "email",
-          recipient: "Carlos Mendoza",
-          contact: "cbaez@ejemplo.com",
-          subject: "Confirmación de Cita (10% Descuento) - Ureña Tax",
-          message: "Servicio: Taxes | Fecha: 2026-11-13 09:00 AM",
-          status: "Pendiente",
-          created_at: new Date(Date.now() - 1000 * 60 * 12).toISOString()
-        },
-        {
-          id: "q-3",
-          channel: "whatsapp",
-          recipient: "Maria Santos",
-          contact: "973-555-0199",
-          subject: "Renovación ITIN",
-          message: "Hola Maria! Le recordamos su cita para el trámite de ITIN sin retener su pasaporte mañana a las 11:00 AM.",
-          status: "Enviado",
-          created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString()
-        },
-        {
-          id: "q-4",
-          channel: "email",
-          recipient: "Luis Ramírez",
-          contact: "luis.correo-invalido",
-          subject: "Confirmación de Consulta Web",
-          message: "Hola Luis, recibimos tu consulta sobre apertura de LLC.",
-          status: "Fallido",
-          errorReason: "Correo electrónico inválido o rechazado por servidor SMTP",
-          created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString()
-        }
-      ];
+    let unifiedQueueCache = [];
 
-      const stored = localStorage.getItem("urena_unified_message_queue");
-      if (!stored) {
-        localStorage.setItem("urena_unified_message_queue", JSON.stringify(defaultQueue));
-        return defaultQueue;
-      }
-      return JSON.parse(stored);
+    function getUnifiedQueue() {
+      if (unifiedQueueCache.length > 0) return unifiedQueueCache;
+      try {
+        const stored = localStorage.getItem("urena_unified_message_queue");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          // Filtrar antiguos registros de demostración si quedaron guardados
+          return parsed.filter(i => !["q-1", "q-2", "q-3", "q-4"].includes(String(i.id)));
+        }
+      } catch (e) {}
+      return [];
     }
 
     function saveUnifiedQueue(q) {
+      unifiedQueueCache = q;
       localStorage.setItem("urena_unified_message_queue", JSON.stringify(q));
       renderUnifiedQueue();
+    }
+
+    async function syncUnifiedQueueFromSupabase() {
+      if (!window.supabaseClient) {
+        renderUnifiedQueue();
+        return;
+      }
+      try {
+        const [{ data: qRows, error: qErr }, { data: campRows }] = await Promise.all([
+          window.supabaseClient.from("email_queue").select("*").order("id", { ascending: false }).limit(200),
+          window.supabaseClient.from("email_campaigns").select("id,name,subject,content,status,started_at,updated_at").order("id", { ascending: false }).limit(100)
+        ]);
+        if (qErr || !Array.isArray(qRows)) {
+          renderUnifiedQueue();
+          return;
+        }
+        const campMap = new Map((campRows || []).map(c => [c.id, c]));
+        const mapped = qRows.map(row => {
+          const camp = campMap.get(row.campaign_id) || {};
+          const rawEmail = String(row.recipient_email || "");
+          const isWa = /^wa:/i.test(rawEmail) || /^\[WHATSAPP\]/i.test(String(camp.subject || ""));
+          const contact = isWa ? rawEmail.replace(/^wa:/i, "") : rawEmail;
+          const bodyTpl = String(camp.content || camp.name || "");
+          const personalized = bodyTpl.replace(/{nombre}/g, row.recipient_name || "Cliente").replace(/{email}/g, contact);
+          return {
+            id: "sb-" + row.id,
+            supabaseId: row.id,
+            campaignId: row.campaign_id,
+            channel: isWa ? "whatsapp" : "email",
+            recipient: row.recipient_name || contact || "Cliente",
+            contact: contact,
+            subject: camp.subject || (isWa ? "Mensaje WhatsApp" : "Correo Ureña Tax"),
+            message: personalized || camp.name || "",
+            status: row.status || "Pendiente",
+            errorReason: row.error_message || undefined,
+            sent_at: row.sent_at || undefined,
+            created_at: row.sent_at || camp.updated_at || camp.started_at || new Date().toISOString()
+          };
+        });
+        unifiedQueueCache = mapped;
+        localStorage.setItem("urena_unified_message_queue", JSON.stringify(mapped));
+        renderUnifiedQueue();
+      } catch (e) {
+        console.warn("Error sincronizando cola desde Supabase:", e);
+        renderUnifiedQueue();
+      }
     }
 
     function enqueueLogItem(item) {
@@ -2968,8 +2977,12 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
       }
     }
 
-    function deleteQueueItem(id) {
+    async function deleteQueueItem(id) {
       if (!confirm("¿Eliminar este registro del log?")) return;
+      const target = getUnifiedQueue().find(i => i.id === id);
+      if (target && target.supabaseId && window.supabaseClient) {
+        await window.supabaseClient.from("email_queue").delete().eq("id", target.supabaseId);
+      }
       const q = getUnifiedQueue().filter(i => i.id !== id);
       saveUnifiedQueue(q);
     }
@@ -3021,10 +3034,16 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
         item.status = "Enviado";
         delete item.errorReason;
         item.sent_at = new Date().toISOString();
+        if (item.supabaseId && window.supabaseClient) {
+          await window.supabaseClient.from("email_queue").update({ status: "Enviado", sent_at: item.sent_at, error_message: null }).eq("id", item.supabaseId);
+        }
         saveUnifiedQueue(q);
       } catch (err) {
         item.status = "Fallido";
         item.errorReason = err.message || "Error de conexión";
+        if (item.supabaseId && window.supabaseClient) {
+          await window.supabaseClient.from("email_queue").update({ status: "Fallido", error_message: item.errorReason }).eq("id", item.supabaseId);
+        }
         saveUnifiedQueue(q);
         alert(`No se pudo enviar a ${item.recipient}: ${item.errorReason}`);
       }
@@ -3056,9 +3075,11 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
       alert(`Despacho finalizado: ${okCount} enviados, ${failCount} fallidos.`);
     }
 
-    // Inicializar la cola unificada al cargar la página
+    // Inicializar la cola unificada al cargar la página (desde Supabase en vivo)
     document.addEventListener("DOMContentLoaded", () => {
-      renderUnifiedQueue();
+      localStorage.removeItem("urena_unified_message_queue");
+      syncUnifiedQueueFromSupabase();
+      setInterval(syncUnifiedQueueFromSupabase, 15000);
     });
 
   
