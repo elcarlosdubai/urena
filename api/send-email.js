@@ -9,7 +9,8 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const { formType, name, phone, email, service, date, time, message, notes, subject } = req.body || {};
+  const { formType, lang, name, phone, email, service, date, time, message, notes, subject } = req.body || {};
+  const isEn = String(lang || '').toLowerCase() === 'en';
 
   // Configuración SMTP Oficial Ureña Tax (premium45.web-hosting.com:465)
   const transporter = nodemailer.createTransport({
@@ -202,8 +203,26 @@ module.exports = async function handler(req, res) {
         transporter.sendMail({
           from: '"Ureña Tax & Accounting" <info@urenatax.com>',
           to: email,
-          subject: '🗓️ Confirmación de Cita (10% Descuento) - Ureña Tax & Accounting',
-          html: appointmentClientHtml
+          subject: isEn
+            ? '🗓️ Appointment Confirmation (10% OFF) - Ureña Tax & Accounting'
+            : '🗓️ Confirmación de Cita (10% Descuento) - Ureña Tax & Accounting',
+          html: isEn
+            ? appointmentClientHtml
+                .replace('lang="es"', 'lang="en"')
+                .replace('Cita Confirmada | Ureña Tax & Accounting', 'Appointment Confirmed | Ureña Tax & Accounting')
+                .replace('¡Tu Cita ha sido Agendada!', 'Your Appointment is Confirmed!')
+                .replace('Confirmación Oficial • Paterson, New Jersey', 'Official Confirmation • Paterson, New Jersey')
+                .replace('Hola <strong>', 'Hi <strong>')
+                .replace('Estimado(a) Cliente', 'Valued Client')
+                .replace('Gracias por agendar con <strong>Ureña Tax & Accounting Services</strong>. Tu espacio ha sido reservado con tu <strong style="color: #047857;">10% de Descuento</strong> automático.', 'Thank you for booking with <strong>Ureña Tax & Accounting Services</strong>. Your spot is reserved with your automatic <strong style="color: #047857;">10% OFF</strong>.')
+                .replace('Servicio Solicitado:', 'Service:')
+                .replace('Fecha y Hora:', 'Date & Time:')
+                .replace('Beneficio:', 'Benefit:')
+                .replace('10% de Descuento Aplicado', '10% Discount Applied')
+                .replace('Reagendar o Consultar por WhatsApp ➔', 'Reschedule or Message Us on WhatsApp ➔')
+                .replace('Oficina Principal Ureña Tax', 'Ureña Tax Main Office')
+                .replace('Línea Directa / WhatsApp:', 'Direct Line / WhatsApp:')
+            : appointmentClientHtml
         })
       );
     }
@@ -212,7 +231,7 @@ module.exports = async function handler(req, res) {
     const appointmentAdminHtml = `
       <div style="font-family: sans-serif; padding: 20px; color: #1F2937; background: #FFFFFF; border-radius: 12px; border: 1px solid #E5E7EB; max-width: 550px;">
         <h2 style="color: #28D070; margin-top: 0;">📅 Nueva Cita Agendada (Postcard 10% OFF)</h2>
-        <p style="font-size: 13px; color: #6B7280;">Origen: Formulario Interactivo /cita/</p>
+        <p style="font-size: 13px; color: #6B7280;">Origen: Formulario Interactivo /cita/ • <strong>Idioma:</strong> ${isEn ? '🇺🇸 Inglés (EN)' : '🇪🇸 Español (ES)'}</p>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 15px 0;">
         <p><strong>Cliente:</strong> ${name || 'No indicado'}</p>
         <p><strong>Teléfono:</strong> <a href="tel:${phone}">${phone || 'No indicado'}</a></p>

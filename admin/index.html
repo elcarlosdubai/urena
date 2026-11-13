@@ -1553,7 +1553,7 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         card.innerHTML = `
           <div class="flex items-start justify-between">
             <div>
-              <span class="font-bold text-[#1F2937] text-xs block">${lead.name}</span>
+              <span class="font-bold text-[#1F2937] text-xs block">${lead.name} ${(/\[EN\]/i.test((lead.source || "") + " " + (lead.message || ""))) ? '<span class="inline-block ml-1 px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-extrabold">🇺🇸 EN</span>' : (/\[ES\]/i.test((lead.source || "") + " " + (lead.message || ""))) ? '<span class="inline-block ml-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold">🇪🇸 ES</span>' : ''}</span>
               <a href="tel:+1${cleanPhone}" class="text-[11px] font-semibold text-[#28D070]">${lead.phone}</a>
             </div>
             <span class="inline-block py-0.5 px-2 rounded text-[10px] font-bold badge-${lead.service}">
@@ -1580,7 +1580,7 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         tr.className = "hover:bg-gray-50 transition-colors";
         tr.innerHTML = `
           <td class="py-2.5 px-4 font-semibold text-[#1F2937]">
-            <span class="block">${lead.name}</span>
+            <span class="block">${lead.name} ${(/\[EN\]/i.test((lead.source || "") + " " + (lead.message || ""))) ? '<span class="inline-block ml-1 px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-extrabold">🇺🇸 EN</span>' : (/\[ES\]/i.test((lead.source || "") + " " + (lead.message || ""))) ? '<span class="inline-block ml-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold">🇪🇸 ES</span>' : ''}</span>
             <span class="text-[10px] text-gray-400 font-normal">${lead.email}</span>
           </td>
           <td class="py-2.5 px-3">

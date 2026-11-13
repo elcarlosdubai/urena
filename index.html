@@ -915,11 +915,11 @@
         <div class="course-tabs">
           <button id="tabBtnOnline" class="course-tab-btn active" onclick="selectCourseTab('online')">
             <span class="tab-title">🌐 Curso Online</span>
-            <span class="tab-price">$297 USD • Grabado</span>
+            <span class="tab-price">$997 USD • Grabado</span>
           </button>
           <button id="tabBtnPresencial" class="course-tab-btn" onclick="selectCourseTab('presencial')">
             <span class="tab-title">🏢 Taller Presencial</span>
-            <span class="tab-price">$497 USD • Paterson, NJ</span>
+            <span class="tab-price">$1,497 USD • Paterson, NJ</span>
           </button>
         </div>
 
@@ -1200,7 +1200,7 @@
         btnO.classList.add('active');
         btnP.classList.remove('active');
         mainBtn.href = 'https://stan.store/urenatax/p/-curso-completo-de-taxes-';
-        mainLabel.textContent = 'Comprar Acceso Online ($297)';
+        mainLabel.textContent = 'Comprar Acceso Online ($997)';
         waBtn.href = 'https://wa.me/15512321994?text=' + encodeURIComponent('Hola Ureña Tax! Quisiera más información sobre el Curso Online de Taxes.');
 
         previewBox.innerHTML = `
@@ -1213,14 +1213,14 @@
           </ul>
           <div class="course-price-tag">
             <span class="lbl">Precio Especial:</span>
-            <span class="amt">$297 USD</span>
+            <span class="amt">$997 USD</span>
           </div>
         `;
       } else {
         btnP.classList.add('active');
         btnO.classList.remove('active');
         mainBtn.href = 'https://stan.store/urenatax/p/-curso-presencial-de-taxes-';
-        mainLabel.textContent = 'Reservar Cupo Presencial ($497)';
+        mainLabel.textContent = 'Reservar Cupo Presencial ($1,497)';
         waBtn.href = 'https://wa.me/15512321994?text=' + encodeURIComponent('Hola Ureña Tax! Quisiera apartar mi cupo para el Taller Presencial de Taxes en Paterson, NJ.');
 
         previewBox.innerHTML = `
@@ -1233,7 +1233,7 @@
           </ul>
           <div class="course-price-tag">
             <span class="lbl">Inversión del Taller:</span>
-            <span class="amt">$497 USD</span>
+            <span class="amt">$1,497 USD</span>
           </div>
         `;
       }

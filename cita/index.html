@@ -58,6 +58,14 @@
 
   <!-- CONTENEDOR 3D DEL POSTCARD -->
   <div class="w-full max-w-4xl perspective-container my-auto">
+    <!-- SELECTOR DE IDIOMA ES / EN (MISMO ICONO DE LA PORTADA) -->
+    <div class="flex justify-end mb-3">
+      <button type="button" onclick="toggleCitaLanguage()" aria-label="Cambiar idioma / Switch language" class="flex items-center rounded-full relative gap-x-2 bg-white shadow-lg p-2 cursor-pointer border border-white/20">
+        <img id="flagEsImg" src="/assets/es-4516c51b.png" alt="ES" width="20" height="20" class="opacity-100 z-20 w-5 h-5 relative transition-opacity" />
+        <img id="flagEnImg" src="/assets/en-0f37e7c0.png" alt="EN" width="20" height="20" class="opacity-50 z-20 w-5 h-5 relative transition-opacity" />
+        <div id="langTogglePill" class="bg-[#28D070] rounded-full w-6 h-6 absolute z-10 left-[6px] transition-all duration-300"></div>
+      </button>
+    </div>
     <div id="postcardInner" class="flip-card-inner relative w-full min-h-[580px] sm:min-h-[530px]">
 
       <!-- ========================================================================= -->
@@ -74,14 +82,14 @@
           <!-- Cabecera Verde: Tag Oficial -->
           <div class="space-y-3 relative z-10">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-wider shadow-xs">
-              <i class="fa-solid fa-stamp text-[#28D070]"></i> Temporada Taxes 2026
+              <i class="fa-solid fa-stamp text-[#28D070]"></i> <span data-i18n="badgeSeason">Temporada Taxes 2026</span>
             </div>
 
-            <h1 class="text-3xl sm:text-4xl font-black leading-tight tracking-tight mt-2">
+            <h1 data-i18n="heroTitle" class="text-3xl sm:text-4xl font-black leading-tight tracking-tight mt-2">
               Tu Reembolso Máximo Garantizado.
             </h1>
 
-            <p class="text-xs sm:text-sm text-black/90 font-medium leading-relaxed">
+            <p data-i18n="heroSub" class="text-xs sm:text-sm text-black/90 font-medium leading-relaxed">
               No dejes tu dinero en la mesa este año. En Ureña Tax preparamos tus taxes con precisión y tramitamos tu ITIN de forma 100% segura.
             </p>
           </div>
@@ -99,14 +107,14 @@
               <div class="w-8 h-8 rounded-xl bg-emerald-50 text-[#139C8E] flex items-center justify-center text-sm font-bold flex-shrink-0">
                 <i class="fa-solid fa-passport text-base"></i>
               </div>
-              <span class="text-xs font-black text-[#1F2937] leading-tight">ITIN sin Retener tu Pasaporte</span>
+              <span data-i18n="featItin" class="text-xs font-black text-[#1F2937] leading-tight">ITIN sin Retener tu Pasaporte</span>
             </div>
 
             <div class="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-xs border border-black/5">
               <div class="w-8 h-8 rounded-xl bg-emerald-50 text-[#139C8E] flex items-center justify-center text-sm font-bold flex-shrink-0">
                 <i class="fa-solid fa-bolt text-base"></i>
               </div>
-              <span class="text-xs font-black text-[#1F2937] leading-tight">Reembolso Rápido por Depósito Directo</span>
+              <span data-i18n="featRefund" class="text-xs font-black text-[#1F2937] leading-tight">Reembolso Rápido por Depósito Directo</span>
             </div>
           </div>
 
@@ -131,20 +139,20 @@
               <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="h-12 sm:h-14 w-auto" />
               <p class="text-[11px] text-gray-400 font-semibold mt-1">Accounting • Business Tax • ITIN Specialist</p>
             </div>
-            <span class="hidden sm:inline-block py-1 px-3 rounded-full bg-emerald-50 text-[#28D070] border border-emerald-200 text-xs font-bold">
+            <span data-i18n="autoDiscount" class="hidden sm:inline-block py-1 px-3 rounded-full bg-emerald-50 text-[#28D070] border border-emerald-200 text-xs font-bold">
               Descuento Automático
             </span>
           </div>
 
           <!-- Centro: Bloque de Descuento Limpio (Sin códigos para digitar) -->
           <div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 bg-gray-50/70 space-y-2 text-center">
-            <span class="text-xs font-extrabold uppercase tracking-widest text-[#28D070] block">
+            <span data-i18n="benefitTag" class="text-xs font-extrabold uppercase tracking-widest text-[#28D070] block">
               ★ BENEFICIO DEL VOLANTE ★
             </span>
-            <h2 class="text-3xl sm:text-4xl font-black text-[#1F2937] tracking-tight">
+            <h2 data-i18n="discountTitle" class="text-3xl sm:text-4xl font-black text-[#1F2937] tracking-tight">
               10% DE DESCUENTO
             </h2>
-            <p class="text-xs text-[#59595B] max-w-sm mx-auto leading-relaxed">
+            <p data-i18n="discountDesc" class="text-xs text-[#59595B] max-w-sm mx-auto leading-relaxed">
               Tu descuento ya viene incluido al escanear este código. Válido para tu declaración personal o de negocio en nuestra oficina de Paterson, NJ o en modalidad virtual.
             </p>
           </div>
@@ -153,13 +161,13 @@
           <div class="space-y-3">
             <button onclick="flipPostcard(true)" class="w-full py-4 px-6 bg-[#28D070] hover:bg-emerald-500 font-black text-black rounded-2xl text-base shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-3 cursor-pointer">
               <i class="fa-solid fa-calendar-check text-lg"></i>
-              <span>Agendar Cita</span>
+              <span data-i18n="ctaBook">Agendar Cita</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
 
             <div class="flex items-center justify-between text-xs text-[#59595B] pt-1">
               <a href="tel:+15512321994" class="hover:text-black font-semibold flex items-center gap-1.5">
-                <i class="fa-solid fa-phone text-[#28D070]"></i> Oficina: (551) 232-1994
+                <i class="fa-solid fa-phone text-[#28D070]"></i> <span data-i18n="officeLabel">Oficina:</span> (551) 232-1994
               </a>
               <span class="text-gray-400 text-[11px] font-medium">Paterson, NJ</span>
             </div>
@@ -180,14 +188,14 @@
             <div class="flex items-center gap-3">
               <img src="/assets/logo-and-tagline-37753a37.svg" alt="Urena Tax Logo" class="h-10 w-auto" />
               <div class="border-l border-gray-200 pl-3">
-                <span class="text-xs font-black text-[#1F2937] block">Reserva de Cita Oficial</span>
-                <span class="text-[10px] text-[#28D070] font-bold">10% de Descuento Asignado</span>
+                <span data-i18n="backTitle" class="text-xs font-black text-[#1F2937] block">Reserva de Cita Oficial</span>
+                <span data-i18n="backSub" class="text-[10px] text-[#28D070] font-bold">10% de Descuento Asignado</span>
               </div>
             </div>
 
             <!-- Botón Volver con onclick directo garantizado -->
             <button type="button" onclick="flipPostcard(false)" class="py-2 px-3.5 bg-gray-100 hover:bg-gray-200 text-[#1F2937] rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shadow-xs">
-              <i class="fa-solid fa-arrow-left text-[#28D070]"></i> <span>Volver</span>
+              <i class="fa-solid fa-arrow-left text-[#28D070]"></i> <span data-i18n="btnBack">Volver</span>
             </button>
           </div>
 
@@ -196,42 +204,42 @@
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Nombre y Apellido *</label>
+                <label data-i18n="lblName" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Nombre y Apellido *</label>
                 <input required type="text" id="clientName" placeholder="Ej: Juan Perez" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-medium" />
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Teléfono de Contacto *</label>
+                <label data-i18n="lblPhone" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Teléfono de Contacto *</label>
                 <input required type="tel" id="clientPhone" maxlength="12" placeholder="551-232-1994" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-medium font-mono" />
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Correo Electrónico *</label>
+                <label data-i18n="lblEmail" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Correo Electrónico *</label>
                 <input required type="email" id="clientEmail" placeholder="juan@ejemplo.com" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-medium" />
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Servicio de Interés *</label>
+                <label data-i18n="lblService" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Servicio de Interés *</label>
                 <select required id="clientService" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-bold">
-                  <option value="Taxes">Declaración de Taxes (1040 / W2 / 1099)</option>
-                  <option value="ITIN">Trámite o Renovación de Número ITIN</option>
-                  <option value="Payroll">Contabilidad de Negocio & Nómina (Payroll)</option>
-                  <option value="Cursos">Cursos de Taxes (Online / Presencial)</option>
-                  <option value="Notary">Notaría Pública & Traducciones</option>
+                  <option value="Taxes" data-i18n="optTaxes">Declaración de Taxes (1040 / W2 / 1099)</option>
+                  <option value="ITIN" data-i18n="optItin">Trámite o Renovación de Número ITIN</option>
+                  <option value="Payroll" data-i18n="optPayroll">Contabilidad de Negocio & Nómina (Payroll)</option>
+                  <option value="Cursos" data-i18n="optCourses">Cursos de Taxes (Online / Presencial)</option>
+                  <option value="Notary" data-i18n="optNotary">Notaría Pública & Traducciones</option>
                 </select>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Día de Preferencia *</label>
+                <label data-i18n="lblDate" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Día de Preferencia *</label>
                 <input required type="date" id="clientDate" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-bold" />
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">Hora Estimada *</label>
+                <label data-i18n="lblTime" class="block text-xs font-bold text-[#59595B] uppercase mb-1">Hora Estimada *</label>
                 <select required id="clientTime" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937] font-bold">
                   <option value="10:00 AM">10:00 AM</option>
                   <option value="11:30 AM">11:30 AM</option>
@@ -244,13 +252,13 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-[#59595B] uppercase mb-1">¿Algún detalle adicional?</label>
+              <label data-i18n="lblNotes" class="block text-xs font-bold text-[#59595B] uppercase mb-1">¿Algún detalle adicional?</label>
               <input type="text" id="clientNotes" placeholder="Ej: Vengo con pasaporte original para ITIN" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-[#28D070] focus:outline-none text-[#1F2937]" />
             </div>
 
             <div class="pt-2">
               <button type="submit" id="submitBtn" class="w-full py-3.5 px-4 bg-[#28D070] hover:bg-[#22c55e] font-black text-black rounded-xl text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
-                <i class="fa-solid fa-check text-base"></i> Confirmar Cita & Reclamar 10% OFF
+                <i class="fa-solid fa-check text-base"></i> <span data-i18n="btnSubmit">Confirmar Cita & Reclamar 10% OFF</span>
               </button>
             </div>
           </form>
@@ -506,25 +514,13 @@
 
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando Cita...';
+      submitBtn.innerHTML = currentCitaLang === "en"
+        ? '<i class="fa-solid fa-spinner fa-spin"></i> Booking Appointment...'
+        : '<i class="fa-solid fa-spinner fa-spin"></i> Registrando Cita...';
+
+      const langTag = currentCitaLang === "en" ? "EN" : "ES";
 
       setTimeout(() => {
-        // Disparar correos dobles (Confirmación al cliente + Alerta a la oficina)
-        fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            formType: "appointment",
-            name: name,
-            phone: phone,
-            email: email,
-            service: service,
-            date: date,
-            time: time,
-            notes: notes
-          })
-        }).catch(err => console.warn("Email dispatch error:", err));
-
         // GUARDAR EN SUPABASE REALTIME CLOUD
         if (window.supabaseClient) {
           window.supabaseClient.from("leads").insert([{
@@ -532,8 +528,8 @@
             phone: phone,
             email: email || "No indicado",
             service: service,
-            message: `[Postcard QR Volante] Fecha: ${date} a las ${time}. Nota: ${notes || "Sin notas"}`,
-            source: "Flyer QR",
+            message: `[${langTag}] [Postcard QR] Fecha: ${date} a las ${time}. Nota: ${notes || "Sin notas"}`,
+            source: `Flyer QR [${langTag}]`,
             status: "Nuevo"
           }]).then(res => console.log("Lead guardado en Supabase:", res));
 
@@ -543,7 +539,7 @@
             service: service,
             appointment_date: date,
             appointment_time: time,
-            notes: `[Postcard 10% OFF] ${notes || "Cita generada desde tarjeta interactiva"}`,
+            notes: `[${langTag}] [Postcard 10% OFF] ${notes || "Cita generada desde tarjeta interactiva"}`,
             status: "Confirmada"
           }]).then(res => console.log("Cita guardada en Supabase:", res));
         }
@@ -597,8 +593,12 @@
         if (volverBtn) volverBtn.style.display = "none";
 
         // 4. ENVIAR CORREO DE CONFIRMACIÓN AL INSTANTE Y REGISTRAR LOG
-        const waText = `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;
-        const emailSubject = `Confirmación de Cita (10% Descuento) - Ureña Tax`;
+        const waText = currentCitaLang === "en"
+          ? `Hi ${name}! We received your appointment request at Ureña Tax for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly. Your 10% discount is locked in!`
+          : `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ. ¡Tu 10% de descuento está asegurado!`;
+        const emailSubject = currentCitaLang === "en"
+          ? `Appointment Confirmation (10% OFF) - Ureña Tax`
+          : `Confirmación de Cita (10% Descuento) - Ureña Tax`;
 
         (async () => {
           let emailStatus = "Enviado";
@@ -609,6 +609,7 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 formType: "appointment",
+                lang: currentCitaLang,
                 name,
                 phone,
                 email,
@@ -690,6 +691,118 @@
         })();
       }, 700);
     }
+
+    // =========================================================================
+    // SELECTOR BILINGÜE ES / EN (POSTCARD /cita)
+    // =========================================================================
+    const CITA_I18N = {
+      es: {
+        badgeSeason: "Temporada Taxes 2026",
+        heroTitle: "Tu Reembolso Máximo Garantizado.",
+        heroSub: "No dejes tu dinero en la mesa este año. En Ureña Tax preparamos tus taxes con precisión y tramitamos tu ITIN de forma 100% segura.",
+        featItin: "ITIN sin Retener tu Pasaporte",
+        featRefund: "Reembolso Rápido por Depósito Directo",
+        autoDiscount: "Descuento Automático",
+        benefitTag: "★ BENEFICIO DEL VOLANTE ★",
+        discountTitle: "10% DE DESCUENTO",
+        discountDesc: "Tu descuento ya viene incluido al escanear este código. Válido para tu declaración personal o de negocio en nuestra oficina de Paterson, NJ o en modalidad virtual.",
+        ctaBook: "Agendar Cita",
+        officeLabel: "Oficina:",
+        backTitle: "Reserva de Cita Oficial",
+        backSub: "10% de Descuento Asignado",
+        btnBack: "Volver",
+        lblName: "Nombre y Apellido *",
+        lblPhone: "Teléfono de Contacto *",
+        lblEmail: "Correo Electrónico *",
+        lblService: "Servicio de Interés *",
+        optTaxes: "Declaración de Taxes (1040 / W2 / 1099)",
+        optItin: "Trámite o Renovación de Número ITIN",
+        optPayroll: "Contabilidad de Negocio & Nómina (Payroll)",
+        optCourses: "Cursos de Taxes (Online / Presencial)",
+        optNotary: "Notaría Pública & Traducciones",
+        lblDate: "Día de Preferencia *",
+        lblTime: "Hora Estimada *",
+        lblNotes: "¿Algún detalle adicional?",
+        btnSubmit: "Confirmar Cita & Reclamar 10% OFF",
+        phName: "Ej: Juan Perez",
+        phEmail: "juan@ejemplo.com",
+        phNotes: "Ej: Vengo con pasaporte original para ITIN"
+      },
+      en: {
+        badgeSeason: "2026 Tax Season",
+        heroTitle: "Your Maximum Refund Guaranteed.",
+        heroSub: "Don't leave money on the table this year. At Ureña Tax we prepare your taxes with precision and process your ITIN 100% securely.",
+        featItin: "ITIN Without Keeping Your Passport",
+        featRefund: "Fast Direct Deposit Refund",
+        autoDiscount: "Automatic Discount",
+        benefitTag: "★ FLYER BENEFIT ★",
+        discountTitle: "10% OFF",
+        discountDesc: "Your discount is already applied when scanning this code. Valid for personal or business tax filing at our Paterson, NJ office or virtually.",
+        ctaBook: "Book Appointment",
+        officeLabel: "Office:",
+        backTitle: "Official Appointment Booking",
+        backSub: "10% Discount Applied",
+        btnBack: "Back",
+        lblName: "Full Name *",
+        lblPhone: "Phone Number *",
+        lblEmail: "Email Address *",
+        lblService: "Service Needed *",
+        optTaxes: "Tax Preparation (1040 / W2 / 1099)",
+        optItin: "New ITIN Application or Renewal",
+        optPayroll: "Business Accounting & Payroll",
+        optCourses: "Tax Courses (Online / In-Person)",
+        optNotary: "Notary Public & Translations",
+        lblDate: "Preferred Date *",
+        lblTime: "Preferred Time *",
+        lblNotes: "Any additional details?",
+        btnSubmit: "Confirm Appointment & Claim 10% OFF",
+        phName: "e.g. John Doe",
+        phEmail: "john@example.com",
+        phNotes: "e.g. Bringing original passport for ITIN"
+      }
+    };
+
+    let currentCitaLang = localStorage.getItem("urena_cita_lang") === "en" ? "en" : "es";
+
+    function applyCitaLanguage(lang) {
+      currentCitaLang = lang === "en" ? "en" : "es";
+      try { localStorage.setItem("urena_cita_lang", currentCitaLang); } catch (e) {}
+      document.documentElement.lang = currentCitaLang;
+
+      const dict = CITA_I18N[currentCitaLang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      const nameIn = document.getElementById("clientName");
+      const emailIn = document.getElementById("clientEmail");
+      const notesIn = document.getElementById("clientNotes");
+      if (nameIn) nameIn.placeholder = dict.phName;
+      if (emailIn) emailIn.placeholder = dict.phEmail;
+      if (notesIn) notesIn.placeholder = dict.phNotes;
+
+      const flagEs = document.getElementById("flagEsImg");
+      const flagEn = document.getElementById("flagEnImg");
+      const pill = document.getElementById("langTogglePill");
+      if (currentCitaLang === "en") {
+        if (flagEs) { flagEs.classList.remove("opacity-100"); flagEs.classList.add("opacity-50"); }
+        if (flagEn) { flagEn.classList.remove("opacity-50"); flagEn.classList.add("opacity-100"); }
+        if (pill) pill.style.transform = "translateX(28px)";
+      } else {
+        if (flagEs) { flagEs.classList.remove("opacity-50"); flagEs.classList.add("opacity-100"); }
+        if (flagEn) { flagEn.classList.remove("opacity-100"); flagEn.classList.add("opacity-50"); }
+        if (pill) pill.style.transform = "translateX(0px)";
+      }
+    }
+
+    window.toggleCitaLanguage = function() {
+      applyCitaLanguage(currentCitaLang === "es" ? "en" : "es");
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      applyCitaLanguage(currentCitaLang);
+    });
   </script>
 </body>
 </html>
