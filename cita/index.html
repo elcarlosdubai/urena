@@ -594,8 +594,8 @@
 
         // 4. ENVIAR CORREO DE CONFIRMACIÓN AL INSTANTE Y REGISTRAR LOG
         const waText = currentCitaLang === "en"
-          ? `Hi ${name}! We received your appointment request at Ureña Tax for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly.${isNormalAppointment ? "" : " Your 10% discount is locked in!"}`
-          : `¡Hola ${name}! Recibimos tu solicitud de cita en Ureña Tax para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ.${isNormalAppointment ? "" : " ¡Tu 10% de descuento está asegurado!"}`;
+          ? `Hi ${name}! We received your appointment request at URENA TAX for ${service} on ${date} at ${time}. An advisor will confirm your spot at 8 Clark St, Paterson, NJ shortly.${isNormalAppointment ? "" : " Your 10% discount is locked in!"}`
+          : `¡Hola ${name}! Recibimos tu solicitud de cita en URENA TAX para ${service} el día ${date} a las ${time}. En breve un asesor confirmará tu espacio en 8 Clark St, Paterson, NJ.${isNormalAppointment ? "" : " ¡Tu 10% de descuento está asegurado!"}`;
         const emailSubject = currentCitaLang === "en"
           ? (isNormalAppointment ? `Appointment Confirmation - URENA TAX` : `Appointment Confirmation (10% OFF) - URENA TAX`)
           : (isNormalAppointment ? `Confirmación de Cita - URENA TAX` : `Confirmación de Cita (10% Descuento) - URENA TAX`);

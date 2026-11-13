@@ -655,7 +655,7 @@
 
             <div>
               <label class="block text-[11px] font-bold text-[#374151] uppercase mb-1">Plantilla de Mensaje</label>
-              <textarea id="waTextEditor" oninput="updatePhonePreview()" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none text-[#374151] leading-relaxed">Hola {nombre}! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En Urena Tax le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.</textarea>
+              <textarea id="waTextEditor" oninput="updatePhonePreview()" rows="5" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-1 focus:ring-[#28D070] focus:outline-none text-[#374151] leading-relaxed">Hola {nombre}! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En URENA TAX le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.</textarea>
               <p class="text-[10px] text-gray-400 mt-1">Variables disponibles: <code class="text-[#28D070] font-bold">{nombre}</code>, <code class="text-[#28D070] font-bold">{servicio}</code></p>
             </div>
 
@@ -730,7 +730,7 @@
                   <!-- Burbuja Simulada -->
                   <div class="wa-bubble p-2.5 max-w-[90%] self-end">
                     <p id="phoneMessagePreview" class="text-[11px] text-[#1F2937] leading-tight">
-                      Hola Carlos Mendoza! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En Urena Tax le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.
+                      Hola Carlos Mendoza! Le recordamos que ya inició la preparación de taxes para la temporada 2026. En URENA TAX le garantizamos su máximo reembolso y trámite de ITIN seguro sin retener su pasaporte. Responda a este mensaje para apartar su cita en 8 Clark St, Paterson, NJ.
                     </p>
                     <div class="flex items-center justify-end gap-1 mt-1 text-[8px] text-[#59595B]">
                       <span>9:41 AM</span>
@@ -811,7 +811,7 @@
 
 Le informamos que la temporada de declaración de impuestos 2026 ya está abierta.
 
-Como cliente de Urena Tax & Accounting Solutions, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
+Como cliente de URENA TAX, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
 
 Nuestros servicios incluyen:
 - Preparación y Reembolso Máximo de Taxes
@@ -859,7 +859,7 @@ Reserve su cita llamando al (551) 232-1994 o visítenos en 8 Clark St, Paterson,
 
                     Le informamos que la temporada de declaración de impuestos 2026 ya está abierta.
 
-                    Como cliente de Urena Tax & Accounting Solutions, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
+                    Como cliente de URENA TAX, tiene asignado un 10% de descuento en la preparación de su declaración personal o de negocio.
 
                     Nuestros servicios incluyen:
                     - Preparación y Reembolso Máximo de Taxes
@@ -1761,7 +1761,7 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         alert("Número inválido.");
         return;
       }
-      let text = (document.getElementById("waTextEditor").value || "").trim() || "Hola! Mensaje de prueba desde Ureña Tax.";
+      let text = (document.getElementById("waTextEditor").value || "").trim() || "Hola! Mensaje de prueba desde URENA TAX.";
       text = text.replace(/{nombre}/g, "Prueba").replace(/{servicio}/g, "Taxes 2026");
       const storedUrl = localStorage.getItem("baileys_service_url");
       const baileysUrl = (storedUrl && !storedUrl.includes("localhost")) ? storedUrl : "https://wa.urenatax.com";

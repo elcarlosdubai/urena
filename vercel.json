@@ -35,7 +35,7 @@
       "destination": "/"
     },
     {
-      "source": "/:path((?!api/|assets/|cita/|citas/|admin/|favicon.svg|robots.txt|sitemap.xml).*)",
+      "source": "/:path((?!api/|assets/|cita/|citas/|admin/|\\.well-known/|llms\\.txt|favicon\\.svg|robots\\.txt|sitemap\\.xml).*)",
       "destination": "/"
     }
   ],

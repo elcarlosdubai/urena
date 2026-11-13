@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "name": "URENA TAX",
+  "description": "Preparación de taxes personales y de negocio, ITIN (IRS CAA), contabilidad, payroll y notaría pública en Paterson, NJ y virtual.",
+  "url": "https://www.urenatax.com",
+  "contact": {
+    "phone": "+1-551-232-1994",
+    "email": "contact@urenataxsolutions.com",
+    "address": "8 Clark St, Paterson, NJ 07505, US"
+  },
+  "resources": [
+    {
+      "name": "Inicio",
+      "url": "https://www.urenatax.com/",
+      "type": "webpage"
+    },
+    {
+      "name": "Agendar Cita",
+      "url": "https://www.urenatax.com/cita?tipo=normal",
+      "type": "booking"
+    },
+    {
+      "name": "Contacto",
+      "url": "https://www.urenatax.com/contact",
+      "type": "contact"
+    },
+    {
+      "name": "LLMs Guide",
+      "url": "https://www.urenatax.com/llms.txt",
+      "type": "documentation"
+    }
+  ]
+}
