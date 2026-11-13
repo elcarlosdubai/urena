@@ -37,7 +37,7 @@
 
   <!-- Preload de recursos críticos para PageSpeed (Performance) -->
   <link rel="preload" href="/assets/index-bb377ad2.css" as="style" />
-  <link rel="preload" href="/assets/index-702b9c4b.js" as="script" />
+  <link rel="modulepreload" href="/assets/index-702b9c4b.js" crossorigin />
   <link rel="stylesheet" href="/assets/index-bb377ad2.css" />
   <script type="module" crossorigin src="/assets/index-702b9c4b.js"></script>
 
@@ -433,7 +433,7 @@
   </style>
 
   <!-- ==================== POPUP MODAL POSTCARD EN PORTADA (EXACTO A CITA - DIVIDIDO EN 2) ==================== -->
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
   
   <div id="promoOverlay" class="postcard-modal-overlay">
     <div class="postcard-modal-container">
@@ -910,6 +910,11 @@
 
       // Mostrar pop-up después de que la portada principal haya cargado por completo (protege LCP y UX)
       window.addEventListener("load", function() {
+        var fa = document.createElement("link");
+        fa.rel = "stylesheet";
+        fa.href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css";
+        document.head.appendChild(fa);
+
         setTimeout(function() {
           if (!sessionStorage.getItem("promo_closed")) {
             window.openPromoModal();
