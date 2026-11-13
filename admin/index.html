@@ -2092,7 +2092,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
             <a href="${waUrl}" target="_blank" title="Confirmar por WhatsApp" class="w-7 h-7 rounded-lg bg-white border border-gray-200 hover:bg-[#28D070] hover:text-black text-[#59595B] flex items-center justify-center text-xs shadow-xs transition-colors">
               <i class="fa-brands fa-whatsapp text-emerald-600"></i>
             </a>
-            <button onclick="deleteAppointment(${apt.id})" title="Cancelar Cita" class="w-7 h-7 rounded-lg bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 text-gray-400 flex items-center justify-center text-[10px] transition-colors">
+            <button onclick="deleteAppointment('${apt.id}')" title="Cancelar Cita" class="w-7 h-7 rounded-lg bg-white border border-gray-200 hover:bg-red-50 hover:text-red-600 text-gray-400 flex items-center justify-center text-[10px] transition-colors">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
@@ -2193,10 +2193,18 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
       renderCalendar();
     };
 
-    window.deleteAppointment = function(id) {
-      if (!confirm("Deseas cancelar esta cita?")) return;
+    window.deleteAppointment = async function(id) {
+      if (!confirm("¿Deseas cancelar y eliminar esta cita?")) return;
+      if (window.supabaseClient) {
+        try {
+          const { error } = await window.supabaseClient.from("appointments").delete().eq("id", id);
+          if (error) console.warn("Error borrando cita en Supabase:", error.message);
+        } catch (e) {
+          console.warn("Error borrando cita en Supabase:", e);
+        }
+      }
       let list = getAppointments();
-      list = list.filter(a => a.id !== id);
+      list = list.filter(a => String(a.id) !== String(id));
       saveAppointmentsList(list);
     };
 
