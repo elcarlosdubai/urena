@@ -157,7 +157,7 @@
         <button onclick="switchTab('calendar')" id="nav-calendar" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
           <i class="fa-regular fa-calendar-days text-sm"></i>
           <span>Calendario</span>
-          <span class="ml-auto text-[11px] px-2 py-0.5 rounded bg-gray-100 text-[#28D070] font-bold">2 Citas</span>
+          <span id="navCalendarBadge" class="ml-auto text-[11px] px-2 py-0.5 rounded bg-gray-100 text-[#28D070] font-bold">0 Citas</span>
         </button>
 
         <button onclick="switchTab('whatsapp')" id="nav-whatsapp" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#59595B] hover:text-black hover:bg-gray-100 transition-all">
@@ -1966,6 +1966,10 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
 
     function renderCalendar() {
       const appointments = getAppointments();
+      const calBadge = document.getElementById("navCalendarBadge");
+      if (calBadge) {
+        calBadge.textContent = appointments.length === 1 ? "1 Cita" : `${appointments.length} Citas`;
+      }
       const grid = document.getElementById("calendarGridDays");
       if (!grid) return;
 
