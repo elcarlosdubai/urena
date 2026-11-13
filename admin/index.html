@@ -2251,23 +2251,23 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
     // =========================================================================
     // MÓDULO DE CURSOS: BASE DE DATOS, IMPORTACIÓN EXCEL Y CAMPAÑAS DE OFERTAS
     // =========================================================================
-    const initialCourseStudents = [
-      { id: 1, name: "Maria Elena Rodriguez", phone: "(551) 234-9988", email: "maria.elena@gmail.com", course: "Online", status: "Oferta Enviada", origin: "Stan Store (Web)", date: "09 Nov 2026" },
-      { id: 2, name: "Jose Ramon Castillo", phone: "(973) 881-2244", email: "jcastillo_taxes@yahoo.com", course: "Presencial", status: "Cupo Reservado", origin: "Excel Importado", date: "08 Nov 2026" },
-      { id: 3, name: "Luisa Fernanda Santos", phone: "(201) 445-6677", email: "luisa.santos@outlook.com", course: "Interesado", status: "Pendiente Oferta", origin: "Excel Importado", date: "07 Nov 2026" },
-      { id: 4, name: "Alexander Batista", phone: "(973) 992-1133", email: "alex.batista@gmail.com", course: "Online", status: "Inscrito", origin: "Stan Store (Web)", date: "05 Nov 2026" }
-    ];
+    const initialCourseStudents = [];
 
     function getCourseStudents() {
+      const demoEmails = new Set(["maria.elena@gmail.com", "jcastillo_taxes@yahoo.com", "luisa.santos@outlook.com", "alex.batista@gmail.com"]);
       const stored = localStorage.getItem("urena_courses_students_v1");
       if (!stored) {
-        localStorage.setItem("urena_courses_students_v1", JSON.stringify(initialCourseStudents));
-        return initialCourseStudents;
+        localStorage.setItem("urena_courses_students_v1", JSON.stringify([]));
+        return [];
       }
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored).filter(s => !demoEmails.has(String(s.email || "").toLowerCase()));
+        if (parsed.length !== JSON.parse(stored).length) {
+          localStorage.setItem("urena_courses_students_v1", JSON.stringify(parsed));
+        }
+        return parsed;
       } catch(e) {
-        return initialCourseStudents;
+        return [];
       }
     }
 
