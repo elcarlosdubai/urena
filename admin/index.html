@@ -1761,15 +1761,16 @@ Responde a este mensaje o entra a stan.store/urenatax para apartar tu lugar hoy 
         alert("Número inválido.");
         return;
       }
-      let text = document.getElementById("waTextEditor").value;
+      let text = (document.getElementById("waTextEditor").value || "").trim() || "Hola! Mensaje de prueba desde Ureña Tax.";
       text = text.replace(/{nombre}/g, "Prueba").replace(/{servicio}/g, "Taxes 2026");
-      const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
+      const storedUrl = localStorage.getItem("baileys_service_url");
+      const baileysUrl = (storedUrl && !storedUrl.includes("localhost")) ? storedUrl : "https://wa.urenatax.com";
       try {
         const res = await fetch(`${baileysUrl}/send-message`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: clean, message: text }),
-          signal: AbortSignal.timeout(10000)
+          signal: AbortSignal.timeout(20000)
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || "HTTP " + res.status);
@@ -2987,7 +2988,8 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
         if (!res.ok) throw new Error(data.error || "Error HTTP " + res.status);
         return true;
       } else {
-        const baileysUrl = localStorage.getItem("baileys_service_url") || "https://wa.urenatax.com";
+        const storedUrl = localStorage.getItem("baileys_service_url");
+        const baileysUrl = (storedUrl && !storedUrl.includes("localhost")) ? storedUrl : "https://wa.urenatax.com";
         const cleanPhone = (item.contact || "").replace(/\D/g, "");
         if (cleanPhone.length < 7) {
           throw new Error("Número WhatsApp inválido: " + (item.contact || "vacío"));
@@ -2996,7 +2998,7 @@ Puedes apagar tu computadora o cerrar el navegador con total tranquilidad. El se
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: cleanPhone, message: item.message }),
-          signal: AbortSignal.timeout(8000)
+          signal: AbortSignal.timeout(20000)
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || "Baileys HTTP " + res.status);

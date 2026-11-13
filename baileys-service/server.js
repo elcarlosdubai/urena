@@ -6,13 +6,6 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-const {
-  default: makeWASocket,
-  useMultiFileAuthState,
-  DisconnectReason,
-  fetchLatestBaileysVersion
-} = require('@whiskeysockets/baileys');
-
 if (!globalThis.WebSocket) {
   globalThis.WebSocket = require('ws');
 }
@@ -80,15 +73,28 @@ async function startBaileys() {
       sock = null;
     }
 
+    const {
+      default: makeWASocket,
+      useMultiFileAuthState,
+      DisconnectReason,
+      fetchLatestBaileysVersion,
+      makeCacheableSignalKeyStore,
+      Browsers
+    } = await import('@whiskeysockets/baileys');
+
+    const baileysLogger = pino({ level: 'silent' });
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
     const { version, isLatest } = await fetchLatestBaileysVersion();
     console.log(`[Baileys] Usando WhatsApp Web v${version.join('.')}, isLatest: ${isLatest}`);
 
     sock = makeWASocket({
       version,
-      auth: state,
-      logger: pino({ level: 'silent' }),
-      browser: ['Urena Tax Portal', 'Chrome', '1.0.0'],
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, baileysLogger)
+      },
+      logger: baileysLogger,
+      browser: Browsers.macOS('Desktop'),
       syncFullHistory: false,
       markOnlineOnConnect: false,
       msgRetryCounterCache,
@@ -167,9 +173,6 @@ async function sendWhatsAppMessage(phone, messageText) {
   } catch (_) {}
 
   try {
-    await sock.sendPresenceUpdate('available', jid);
-    await sleep(randomBetween(800, 1600));
-    await sock.presenceSubscribe(jid).catch(() => {});
     await sock.sendPresenceUpdate('composing', jid);
 
     // Simular tiempo de escritura humano según longitud del mensaje (2.5s a 6.5s)
