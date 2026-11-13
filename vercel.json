@@ -4,47 +4,39 @@
   "rewrites": [
     {
       "source": "/citas",
-      "destination": "/cita/index.html"
+      "destination": "/cita"
     },
     {
       "source": "/citas/(.*)",
-      "destination": "/cita/index.html"
-    },
-    {
-      "source": "/cita",
-      "destination": "/cita/index.html"
+      "destination": "/cita"
     },
     {
       "source": "/cita/(.*)",
-      "destination": "/cita/index.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/admin/index.html"
+      "destination": "/cita"
     },
     {
       "source": "/admin/(.*)",
-      "destination": "/admin/index.html"
+      "destination": "/admin"
     },
     {
       "source": "/contact",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/about",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/services",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/services/(.*)",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
-      "source": "/:path((?!api(?:/|$)|assets(?:/|$)|cita(?:/|$)|citas(?:/|$)|admin(?:/|$)|favicon\\.svg$|robots\\.txt$|sitemap\\.xml$).*)",
-      "destination": "/index.html"
+      "source": "/:path((?!api/|assets/|cita/|citas/|admin/|favicon.svg|robots.txt|sitemap.xml).*)",
+      "destination": "/"
     }
   ],
   "headers": [
